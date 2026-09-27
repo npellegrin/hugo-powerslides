@@ -1,0 +1,6 @@
+# Module configuration for sites that import this theme.
+[module]
+  [module.hugoVersion]
+    # Oldest version tested in CI (see .github/workflows/ci.yml). The standard edition is enough.
+    min = "0.123.0"
+    extended = false

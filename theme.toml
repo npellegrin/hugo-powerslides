@@ -1,0 +1,23 @@
+# Metadata for the Hugo themes gallery (https://themes.gohugo.io).
+name = "PowerSlides"
+license = "MIT"
+licenselink = "https://github.com/npellegrin/hugo-powerslides/blob/main/LICENSE"
+description = "Markdown slide decks for Hugo: layouts, transitions, step-by-step reveals, presenter mode, PDF export, and color themes, with no required front-end dependency."
+homepage = "https://github.com/npellegrin/hugo-powerslides"
+demosite = "https://npellegrin.github.io/hugo-powerslides-demo/"
+tags = ["presentation", "slides", "dark", "light", "responsive", "accessibility", "no-javascript-framework"]
+features = [
+  "Slide decks from Markdown",
+  "Layouts, backgrounds, and footer",
+  "Step-by-step reveals and slide transitions",
+  "Presenter mode with notes and timer",
+  "Overview and go-to-slide",
+  "PDF export",
+  "Color themes and syntax highlighting",
+  "Math (KaTeX) and diagrams (Mermaid), loaded only when used",
+  "Content-Security-Policy and Subresource Integrity"
+]
+
+[author]
+  name = "Nicolas Pellegrin"
+  homepage = "https://github.com/npellegrin"

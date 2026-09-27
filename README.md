@@ -1,14 +1,15 @@
 # Hugo PowerSlides
 
-A lightweight Markdown slide theme for Hugo.
+A full-featured Markdown presentation theme for Hugo: layouts, transitions, step-by-step reveals, presenter mode, PDF export, color themes, math, and diagrams.
 
-The theme is designed to be easy to maintain, customize, and extend without dependencies.
+It needs no build tooling beyond Hugo and no required front-end dependency: KaTeX and Mermaid load only on pages that use them. The code is split into small CSS files and JavaScript modules, one per concern, with unit tests, so that it stays readable despite its scope.
+
+[Demo](https://npellegrin.github.io/hugo-powerslides-demo/) · [Changelog](CHANGELOG.md)
 
 ## Requirements
 
-- Hugo Extended
-- Go
-- Git
+- Hugo 0.123.0 or later; the standard edition is enough, Extended is not required
+- Go and Git, to install the theme as a Hugo Module
 
 Check your installation:
 
@@ -46,14 +47,24 @@ Run Hugo:
 hugo server
 ```
 
+To pin a version, use a release tag: `hugo mod get github.com/npellegrin/hugo-powerslides@v0.1.0`.
+
+Without Hugo Modules, clone the theme into `themes/hugo-powerslides` (for example as a Git submodule) and set `theme = "hugo-powerslides"` in `hugo.toml`.
+
+## Site structure
+
+- Each regular page is a slide deck: `content/talks/my-talk.md`.
+- The home page, sections, and taxonomy pages list their decks, with their title, `description`, date, and number of slides.
+- To make the home page (or a section) a deck itself, give its `_index.md` the front matter `layout: "slides"`.
+
 ## Writing slides
 
-Use the `slides` layout and separate slides with `---`:
+Separate slides with `---`:
 
 ```markdown
 ---
 title: "My talk"
-layout: "slides"
+description: "Shown in the list of decks."
 ---
 
 {{< slide id="intro" layout="title" transition="zoom" >}}
@@ -257,3 +268,20 @@ Allow what your slides need:
 ```
 
 Styles allow `'unsafe-inline'` because the theme, KaTeX, and Mermaid set inline styles. A `<meta>` policy cannot set `frame-ancestors`; to prevent other sites from framing the slides, send that directive (or `X-Frame-Options`) as an HTTP header from the web server.
+
+## Development
+
+The theme needs no build tool: Hugo bundles the CSS and JavaScript. Node.js 20 or later is only needed to run the unit tests:
+
+```bash
+npm test
+```
+
+Continuous integration runs the tests and builds the [demo](https://github.com/npellegrin/hugo-powerslides-demo) with the minimum supported Hugo version and the latest release, failing on any warning. It checks out both repositories side by side, as the demo's `go.mod` expects.
+
+To release a version:
+
+1. Move the changes under `Unreleased` in `CHANGELOG.md` to the new version.
+2. Tag the commit: `git tag v0.1.0 && git push origin v0.1.0`.
+
+The [Hugo themes gallery](https://github.com/gohugoio/hugoThemesSiteBuilder) also needs two screenshots in `images/`: `screenshot.png` (1500×1000) and `tn.png` (900×600).

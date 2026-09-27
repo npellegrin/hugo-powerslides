@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - run: npm test
+
+  build:
+    name: Demo build (Hugo ${{ matrix.hugo }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The minimum version declared in hugo.toml, and the latest release.
+        hugo: ["0.123.0", "latest"]
+    steps:
+      # The demo's go.mod points to ../hugo-powerslides, so both repositories are checked out side by side.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: hugo-powerslides
+          persist-credentials: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: npellegrin/hugo-powerslides-demo
+          path: hugo-powerslides-demo
+          persist-credentials: false
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Install Hugo
+        run: hugo-powerslides/.github/scripts/install-hugo.sh "$HUGO_VERSION"
+        env:
+          HUGO_VERSION: ${{ matrix.hugo }}
+
+      # Any warning, including deprecations in newer Hugo versions, fails the build.
+      - name: Build the demo
+        working-directory: hugo-powerslides-demo
+        run: hugo --panicOnWarning --cleanDestinationDir
+
+      - name: Build the demo under a subfolder
+        working-directory: hugo-powerslides-demo
+        run: hugo --panicOnWarning --baseURL "https://example.com/talks/" --destination public-subfolder

@@ -1,13 +1,18 @@
-{{- /* Joins the theme's CSS files, in cascade order, into one fingerprinted stylesheet (minified in production). */ -}}
-{{- $files := slice
-  "tokens" "themes" "base" "typography" "code" "components" "layouts"
-  "transitions" "animations" "controls" "overview" "presenter" "print"
+{{- /* Joins the theme's CSS files, in cascade order, into one fingerprinted stylesheet (minified in production).
+       Usage: partial "powerslides/stylesheet.html" "slides" (or "list") */ -}}
+{{- $bundles := dict
+  "slides" (slice
+    "tokens" "themes" "base" "typography" "code" "components" "layouts"
+    "transitions" "animations" "controls" "overview" "presenter" "print"
+  )
+  "list" (slice "tokens" "themes" "list")
 }}
+{{- $files := index $bundles . }}
 {{- $parts := slice }}
 {{- range $files }}
   {{- $parts = $parts | append (resources.Get (printf "slides/css/%s.css" .)) }}
 {{- end }}
-{{- $css := $parts | resources.Concat "slides/slides.css" }}
+{{- $css := $parts | resources.Concat (printf "slides/%s.css" .) }}
 {{- if hugo.IsProduction }}
   {{- $css = $css | minify }}
 {{- end }}

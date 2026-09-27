@@ -1,0 +1,58 @@
+{{- /* Home, section, and taxonomy pages: a list of slide decks. An _index.md with layout: "slides" is a deck instead. */ -}}
+{{- $params := site.Params.powerslides | default dict }}
+{{- $theme := .Params.theme | default ($params.theme | default "dark") -}}
+<!doctype html>
+<html lang="{{ site.Language.LanguageCode | default site.Language.Lang }}" data-theme="{{ $theme }}">
+<head>
+  {{ partial "powerslides/head.html" (dict
+    "page" .
+    "bundle" "list"
+    "policy" (partial "powerslides/csp.html" dict)
+  ) }}
+</head>
+
+<body class="deck-list">
+  <main class="deck-list__main">
+    <header class="deck-list__header">
+      {{ if not .IsHome }}
+        <p class="deck-list__breadcrumb"><a href="{{ with .Parent }}{{ .RelPermalink }}{{ else }}{{ site.Home.RelPermalink }}{{ end }}">← Back</a></p>
+      {{ end }}
+      <h1>{{ with .Title }}{{ . }}{{ else }}{{ site.Title }}{{ end }}</h1>
+      {{ with .Description | default (cond .IsHome site.Params.description "") }}
+        <p class="deck-list__intro">{{ . }}</p>
+      {{ end }}
+      {{ with .Content }}
+        <div class="deck-list__content">{{ . }}</div>
+      {{ end }}
+    </header>
+
+    {{ with .Pages }}
+      <ul class="deck-list__items" role="list">
+        {{ range . }}
+          <li class="deck-card">
+            <h2 class="deck-card__title">
+              <a class="deck-card__link" href="{{ .RelPermalink }}">{{ .Title }}</a>
+            </h2>
+            {{ with .Description }}
+              <p class="deck-card__description">{{ . }}</p>
+            {{ end }}
+            <p class="deck-card__meta">
+              {{ if .IsNode }}
+                <span>Collection · {{ len .Pages }} {{ cond (eq (len .Pages) 1) "item" "items" }}</span>
+              {{ else }}
+                {{ $slideCount := add (len (findRE `<hr\s*/?>` .Content)) 1 }}
+                <span>{{ $slideCount }} {{ cond (eq $slideCount 1) "slide" "slides" }}</span>
+              {{ end }}
+              {{ if not .Date.IsZero }}
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
+              {{ end }}
+            </p>
+          </li>
+        {{ end }}
+      </ul>
+    {{ else }}
+      <p class="deck-list__empty">No presentations yet.</p>
+    {{ end }}
+  </main>
+</body>
+</html>

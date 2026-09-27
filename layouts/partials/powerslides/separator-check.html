@@ -1,0 +1,12 @@
+{{- /* Warns when a "---" line sits right under text: Markdown reads it as a heading underline, not a slide separator.
+       Usage: partial "powerslides/separator-check.html" . */ -}}
+{{- with .File }}
+  {{- $path := .Path }}
+  {{- $source := replaceRE "(?ms)^[ \t]*(```|~~~).*?^[ \t]*(```|~~~)" "" $.RawContent }}
+  {{- range findRE `(?m)^[^\n]*\S[^\n]*\n[ \t]{0,3}-{3,}[ \t]*$` $source }}
+    {{- $line := index (split . "\n") 0 }}
+    {{- if not (findRE `^[ \t]*([-*+>|#]|\d+[.)]\s|$)` $line 1) }}
+      {{- warnf "%s: the \"---\" line after %q makes a heading, not a new slide. Add a blank line before it." $path (trim $line " \t") }}
+    {{- end }}
+  {{- end }}
+{{- end }}

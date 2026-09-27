@@ -2,7 +2,8 @@
 
 ## Project
 
-- Lightweight Hugo slide theme with no front-end dependencies. Preserve this simplicity and follow Hugo Modules conventions.
+- Full-featured Hugo presentation theme with no build tooling beyond Hugo and no required front-end dependency. Follow Hugo Modules conventions.
+- The feature set is already broad: add a feature only for a clear need, and keep each addition small, isolated in its own file, and optional when possible.
 - Keep source changes in `layouts/`, `assets/` (CSS and JavaScript, built by Hugo Pipes), and `static/`. Do not edit generated files in `public/`.
 - Use the neighboring `../hugo-powerslides-demo` project for integration checks; its `go.mod` uses a local `replace` directive for this theme.
 - Write all project-authored material in English, including code comments, documentation, slide content, and user-facing text, unless explicitly asked otherwise.
@@ -27,7 +28,8 @@
 - Preserve the shortcode contract: each slide is a `<section data-slide>` with a stable ID and Markdown content.
 - Prefer semantic HTML, accessible labels, and native controls. Preserve keyboard navigation and existing commands.
 - Keep JavaScript dependency-free and deferred. Hugo's built-in `js.Build` bundles the modules; no Node.js tooling is required. Handle optional elements safely; add a dependency only for a demonstrated need.
-- External libraries are loaded only where needed, from pinned versions with Subresource Integrity, and must be allowed by the Content-Security-Policy in the slides layout.
+- External libraries are loaded only where needed, from pinned versions with Subresource Integrity. Versions and hashes live in `layouts/partials/powerslides/libraries.html`; the Content-Security-Policy is built in `csp.html` next to it.
+- Stay compatible with the minimum Hugo version in `hugo.toml` and with the latest release; CI builds with both.
 - Respect `prefers-reduced-motion`; transitions must not obstruct reading or slide navigation.
 
 ## Design and Accessibility
@@ -39,5 +41,7 @@
 
 ## Verification
 
-- After theme changes, run `hugo` from `../hugo-powerslides-demo`; use `hugo server` for visual checks.
+- After theme changes, run `hugo --panicOnWarning` from `../hugo-powerslides-demo`; use `hugo server` for visual checks.
+- After JavaScript changes, run `npm test` (Node.js built-in test runner, no dependency) and add tests for new behavior.
+- Record user-visible changes in `CHANGELOG.md`.
 - For template or shortcode changes, inspect the generated HTML and check missing content and implicit IDs.

@@ -1,0 +1,28 @@
+{{- /* Head elements shared by slide and list pages.
+       Usage: partial "powerslides/head.html" (dict "page" . "bundle" "slides" "policy" $policy) */ -}}
+{{- $page := .page }}
+{{- $params := site.Params.powerslides | default dict }}
+{{- $colors := merge ($params.colors | default dict) ($page.Params.colors | default dict) }}
+<meta charset="utf-8">
+{{ with .policy }}
+  <meta http-equiv="Content-Security-Policy" content="{{ . }}">
+{{ end }}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ with $page.Title }}{{ . }}{{ else }}{{ site.Title }}{{ end }}</title>
+{{ with $page.Description }}
+  <meta name="description" content="{{ . }}">
+{{ end }}
+
+{{/* Page front matter, then site params, then the theme's icon */}}
+<link rel="icon" href="{{ with $page.Params.favicon | default $params.favicon }}{{ partial "powerslides/url.html" (dict "url" . "page" $page) }}{{ else }}{{ "slides/favicon.svg" | relURL }}{{ end }}">
+{{ partial "powerslides/stylesheet.html" .bundle }}
+{{ range $params.customcss }}
+  <link rel="stylesheet" href="{{ partial "powerslides/url.html" (dict "url" .) }}">
+{{ end }}
+{{ with $colors }}
+  {{ $css := "" }}
+  {{ range $name, $value := . }}
+    {{ $css = printf "%s--color-%s: %s;" $css $name $value }}
+  {{ end }}
+  <style>:root { {{ $css | safeCSS }} }</style>
+{{ end }}

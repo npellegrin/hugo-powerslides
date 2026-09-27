@@ -1,0 +1,37 @@
+{{- /* Content-Security-Policy for a page, or "" when disabled with csp.enable = false.
+       Remote libraries are allowed only at their exact version path, and only on pages that load them.
+       Styles need 'unsafe-inline': the theme, KaTeX, and Mermaid all set inline styles.
+       Usage: partial "powerslides/csp.html" (dict "math" true "mermaid" false) */ -}}
+{{- $csp := (site.Params.powerslides | default dict).csp | default dict }}
+{{- $libraries := partial "powerslides/libraries.html" }}
+{{- $policy := "" }}
+{{- if ne $csp.enable false }}
+  {{- $scripts := slice "'self'" }}
+  {{- $styles := slice "'self'" "'unsafe-inline'" }}
+  {{- $fonts := slice "'self'" }}
+  {{- $katexBase := $libraries.katex.base }}
+  {{- if and .math (hasPrefix $katexBase "http") }}
+    {{- $katexSource := printf "%s/" (strings.TrimSuffix "/" $katexBase) }}
+    {{- $scripts = $scripts | append $katexSource }}
+    {{- $styles = $styles | append $katexSource }}
+    {{- $fonts = $fonts | append $katexSource }}
+  {{- end }}
+  {{- if and .mermaid (hasPrefix $libraries.mermaid.url "http") }}
+    {{- $scripts = $scripts | append $libraries.mermaid.url }}
+  {{- end }}
+  {{- $directives := slice
+    "default-src 'self'"
+    (printf "script-src %s" (delimit ($scripts | append ($csp.scriptsrc | default slice)) " "))
+    (printf "style-src %s" (delimit ($styles | append ($csp.stylesrc | default slice)) " "))
+    (printf "font-src %s" (delimit ($fonts | append ($csp.fontsrc | default slice)) " "))
+    (printf "img-src 'self' data: %s" (delimit ($csp.imgsrc | default slice) " "))
+    (printf "media-src 'self' %s" (delimit ($csp.mediasrc | default slice) " "))
+    (printf "connect-src 'self' %s" (delimit ($csp.connectsrc | default slice) " "))
+    (printf "frame-src %s" (delimit ($csp.framesrc | default (slice "'none'")) " "))
+    "object-src 'none'"
+    "base-uri 'self'"
+    "form-action 'none'"
+  }}
+  {{- $policy = delimit $directives "; " | replaceRE ` +;` ";" | replaceRE ` +$` "" }}
+{{- end }}
+{{- return $policy }}

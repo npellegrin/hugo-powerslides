@@ -1,0 +1,105 @@
+/* List of slide decks: home, section, and taxonomy pages. Uses the theme colors, at normal page scale. */
+
+* {
+  box-sizing: border-box;
+}
+
+body.deck-list {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.deck-list__main {
+  width: min(64rem, 100% - 2rem);
+  margin-inline: auto;
+  padding-block: 3rem 4rem;
+}
+
+.deck-list__header {
+  margin-bottom: 2.5rem;
+}
+
+.deck-list__header h1 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.1;
+  text-shadow: var(--heading-glow);
+}
+
+.deck-list__intro,
+.deck-list__empty {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.deck-list__breadcrumb {
+  margin: 0 0 1rem;
+}
+
+.deck-list a {
+  color: var(--color-primary);
+  text-underline-offset: 0.15em;
+}
+
+.deck-list a:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 0.2em;
+}
+
+.deck-list__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(18rem, 100%), 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deck-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-top: 0.3rem solid var(--color-primary);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.deck-card:hover {
+  border-color: var(--color-primary);
+}
+
+.deck-card__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+/* The whole card is clickable through the title link, which stays the only focus stop. */
+.deck-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.deck-card__description {
+  margin: 0;
+}
+
+.deck-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: auto 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}

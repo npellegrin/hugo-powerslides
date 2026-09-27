@@ -1,0 +1,15 @@
+{{- /* External libraries: pinned versions with their Subresource Integrity hashes. Update versions and hashes together.
+       The base URLs can point to self-hosted copies of the same files (katexURL and mermaidURL params). */ -}}
+{{- $params := site.Params.powerslides | default dict }}
+{{- return dict
+  "katex" (dict
+    "base" ($params.katexurl | default "https://cdn.jsdelivr.net/npm/katex@0.18.7/dist")
+    "css" "sha384-JctiRyLzXCrSoOOzFlSoWLdyzQl7OrrRnhyeBmzB6ZWtcjccUyc8lCQJqIbs3uQX"
+    "js" "sha384-+7Keh381hSkXmXqnjC0JBM/kzsN6TFj+wMKychSLjTvJ8/0ElMde2uKl8i6p6Buj"
+    "autoRender" "sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz"
+  )
+  "mermaid" (dict
+    "url" ($params.mermaidurl | default "https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js")
+    "js" "sha384-EOXBFmc3gx5mb+vn0vPvvGqACToJD24hhacX5Yx+8NUUQrHIle/Qi5Bg9o3zKwW2"
+  )
+-}}

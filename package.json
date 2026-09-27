@@ -1,0 +1,12 @@
+{
+  "name": "hugo-powerslides",
+  "private": true,
+  "description": "Development tasks for the theme. The theme itself needs neither Node.js nor any package.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
