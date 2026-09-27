@@ -2,7 +2,7 @@
 {{ $ratio := .Get "ratio" | default "16/9" }}
 <div class="embed" style="{{ printf "--embed-ratio: %s;" (replace $ratio "/" " / ") | safeCSS }}">
   <iframe
-    data-src="{{ .Get "src" }}"
+    data-src="{{ partial "powerslides/url.html" (dict "url" (.Get "src") "page" .Page) }}"
     title="{{ .Get "title" | default "Embedded content" }}"
     allow="fullscreen; picture-in-picture; clipboard-write"
     referrerpolicy="strict-origin-when-cross-origin"

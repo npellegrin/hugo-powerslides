@@ -1,0 +1,3 @@
+{{- $href := partial "powerslides/url.html" (dict "url" .Destination "page" .Page) -}}
+<a href="{{ $href }}"{{ with .Title }} title="{{ . }}"{{ end }}>{{ .Text | safeHTML }}</a>
+{{- /* Trims the trailing newline so inline images and links do not gain a space */ -}}

@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="{{ $katexBase }}/katex.min.css" integrity="sha384-JctiRyLzXCrSoOOzFlSoWLdyzQl7OrrRnhyeBmzB6ZWtcjccUyc8lCQJqIbs3uQX" crossorigin="anonymous" referrerpolicy="no-referrer">
   {{ end }}
   {{ range $params.customcss }}
-    <link rel="stylesheet" href="{{ . | relURL }}">
+    <link rel="stylesheet" href="{{ partial "powerslides/url.html" (dict "url" .) }}">
   {{ end }}
   {{/* One printed page per slide, at the canvas size */}}
   <style>@page { size: {{ $width }}px {{ $height }}px; margin: 0; }</style>
@@ -113,12 +113,12 @@
       >
         {{ with index $meta "background-image" }}
           <div class="slide__background" aria-hidden="true">
-            <img src="{{ . | relURL }}" alt="">
+            <img src="{{ partial "powerslides/url.html" (dict "url" . "page" $) }}" alt="">
           </div>
         {{ end }}
         {{ with $meta.image }}
           <figure class="slide__media">
-            <img src="{{ . | relURL }}" alt="{{ $meta.alt | default "" }}">
+            <img src="{{ partial "powerslides/url.html" (dict "url" . "page" $) }}" alt="{{ $meta.alt | default "" }}">
           </figure>
         {{ end }}
         <div class="slide__content">
@@ -130,7 +130,7 @@
         {{ if or $footer.text $footer.logo (ne $footer.number false) }}
           <footer class="slide__footer">
             {{ with $footer.logo }}
-              <img class="slide__footer-logo" src="{{ . | relURL }}" alt="{{ $footer.logoalt | default "" }}">
+              <img class="slide__footer-logo" src="{{ partial "powerslides/url.html" (dict "url" . "page" $) }}" alt="{{ $footer.logoalt | default "" }}">
             {{ end }}
             <span class="slide__footer-text">{{ with $footer.text }}{{ . | markdownify }}{{ end }}</span>
             {{ if ne $footer.number false }}

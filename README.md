@@ -123,6 +123,16 @@ Markdown tables, code blocks, blockquotes, task lists, `<kbd>`, and `<mark>` are
 - **Math**: write `\( … \)` inline and `$$ … $$` or `\[ … \]` for blocks. KaTeX loads only when a page contains these delimiters; force it with `math: true` or `math: false` in front matter. It needs the Goldmark passthrough extension (see below).
 - **Diagrams**: a ```` ```mermaid ```` code block becomes a Mermaid diagram in the slide's colors. Mermaid loads only on pages that contain one.
 
+### Images and links
+
+Paths work the same whether the site is served from the domain root or a subfolder (for example `baseURL = "https://example.com/talks/"`):
+
+- `/images/photo.jpg` points to the site's `static/images/photo.jpg`, with the base path added;
+- `photo.jpg` uses the file next to the Markdown file (page bundle) when there is one;
+- full URLs and `#anchors` are left unchanged.
+
+This applies to Markdown images and links, and to every theme option or shortcode that takes a path (`image`, `background-image`, `figure`, `video`, footer `logo`, `customCSS`).
+
 ### Footer
 
 A footer with the slide number is shown on every slide except `title` and `hero` layouts. Add a text and a logo in the configuration below; set `number = false` to remove the number. Hide it on one slide with `class="no-footer"`.

@@ -1,0 +1,21 @@
+{{- /* Resolves a URL written by the author so it works when the site is deployed under a subfolder.
+       - Absolute URLs, fragments, and data URIs are kept.
+       - Paths starting with "/" are relative to the site root, including its base path (Hugo's relURL
+         would treat them as relative to the host and drop the base path).
+       - Other relative paths use a matching page resource when there is one, else stay relative to the page.
+       Usage: partial "powerslides/url.html" (dict "url" "/images/a.png" "page" .Page) */ -}}
+{{- $url := .url | default "" }}
+{{- $result := $url }}
+{{- $parsed := urls.Parse $url }}
+{{- if or $parsed.Scheme (hasPrefix $url "//") (hasPrefix $url "#") (eq $url "") }}
+  {{- $result = $url }}
+{{- else if hasPrefix $url "/" }}
+  {{- $result = strings.TrimPrefix "/" $url | relURL }}
+{{- else if .page }}
+  {{- with .page.Resources.Get $parsed.Path }}
+    {{- $result = .RelPermalink }}
+    {{- with $parsed.RawQuery }}{{ $result = printf "%s?%s" $result . }}{{ end }}
+    {{- with $parsed.Fragment }}{{ $result = printf "%s#%s" $result . }}{{ end }}
+  {{- end }}
+{{- end }}
+{{- return $result }}

@@ -2,8 +2,8 @@
 {{ $autoplay := eq (.Get "autoplay") "true" }}
 <figure class="media">
   <video
-    src="{{ .Get "src" | relURL }}"
-    {{ with .Get "poster" }}poster="{{ . | relURL }}"{{ end }}
+    src="{{ partial "powerslides/url.html" (dict "url" (.Get "src") "page" .Page) }}"
+    {{ with .Get "poster" }}poster="{{ partial "powerslides/url.html" (dict "url" . "page" $.Page) }}"{{ end }}
     {{ with .Get "title" }}aria-label="{{ . }}"{{ end }}
     {{ if ne (.Get "controls") "false" }}controls{{ end }}
     {{ if eq (.Get "loop") "true" }}loop{{ end }}

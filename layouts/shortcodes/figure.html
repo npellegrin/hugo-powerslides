@@ -1,6 +1,6 @@
 <figure class="figure">
   <img
-    src="{{ .Get "src" | relURL }}"
+    src="{{ partial "powerslides/url.html" (dict "url" (.Get "src") "page" .Page) }}"
     alt="{{ .Get "alt" | default "" }}"
   >
 

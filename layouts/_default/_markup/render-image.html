@@ -1,0 +1,3 @@
+{{- $src := partial "powerslides/url.html" (dict "url" .Destination "page" .Page) -}}
+<img src="{{ $src }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ range $key, $value := .Attributes }}{{ if not (in (slice "src" "alt") $key) }} {{ $key | safeHTMLAttr }}="{{ $value }}"{{ end }}{{ end }}>
+{{- /* Trims the trailing newline so inline images and links do not gain a space */ -}}
