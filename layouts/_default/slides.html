@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="{{ site.Language.Lang | default "fr" }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>
+    {{ if .Title }}{{ .Title }}{{ else }}{{ site.Title }}{{ end }}
+  </title>
+
+  <link rel="stylesheet" href="{{ "slides/slides.css" | relURL }}">
+</head>
+
+<body class="slides-page">
+  <main
+    id="presentation"
+    class="presentation"
+    data-title="{{ .Title | htmlEscape }}"
+  >
+    {{/* Slides are separated by a Markdown horizontal rule (---); an optional */}}
+    {{/* {{< slide id="..." transition="..." >}} marker at the top of a slide sets its id/transition */}}
+    {{ $content := replaceRE `<hr\s*/?>` "<hr>" .Content }}
+    {{ range $index, $part := split $content "<hr>" }}
+      {{ $id := printf "slide-%d" (add $index 1) }}
+      {{ $transition := "fade" }}
+      {{ $body := $part }}
+      {{ with index (findRE `<div class="slide-meta"[^>]*></div>` $part 1) 0 }}
+        {{ $meta := . }}
+        {{ with index (findRE `data-id="[^"]*"` $meta 1) 0 }}
+          {{ with replaceRE `data-id="([^"]*)"` "$1" . }}
+            {{ $id = . }}
+          {{ end }}
+        {{ end }}
+        {{ with index (findRE `data-transition="[^"]*"` $meta 1) 0 }}
+          {{ with replaceRE `data-transition="([^"]*)"` "$1" . }}
+            {{ $transition = . }}
+          {{ end }}
+        {{ end }}
+        {{ $body = replace $part $meta "" }}
+      {{ end }}
+      <section
+        class="slide slide--{{ $transition }}"
+        id="{{ $id }}"
+        data-slide
+        data-transition="{{ $transition }}"
+      >
+        <div class="slide__content">
+          {{ $body | safeHTML }}
+        </div>
+      </section>
+    {{ end }}
+
+    {{/* Populated by slides.js with the current slide's [data-notes] title and content, shown only in presenter mode */}}
+    <aside class="speaker-notes-panel" data-notes-panel hidden>
+      <div data-notes-panel-content></div>
+    </aside>
+  </main>
+
+  <nav class="controls" aria-label="Navigation">
+    <button type="button" data-action="previous" aria-label="Previous slide">
+      ←
+    </button>
+
+    <span class="slide-counter">
+      <span data-current-slide>1</span>
+      /
+      <span data-total-slides>1</span>
+    </span>
+
+    <button type="button" data-action="next" aria-label="Next slide">
+      →
+    </button>
+
+    <button type="button" data-action="fullscreen" aria-label="Fullscreen">
+      ⛶
+    </button>
+
+    <button type="button" data-action="presenter" aria-label="Presenter mode">
+      Presenter
+    </button>
+  </nav>
+
+  <script src="{{ "slides/slides.js" | relURL }}" defer></script>
+</body>
+</html>
