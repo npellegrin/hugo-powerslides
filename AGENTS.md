@@ -14,7 +14,7 @@
 - Follow SOLID, clean code, and clean architecture principles pragmatically: small files, one responsibility per module or class, explicit names, and no speculative abstractions.
 - No file should grow into a catch-all. Split by responsibility before a file becomes hard to read.
 - JavaScript lives in `assets/slides/js/` as ES modules: `core/` (navigation state), `views/` (what is displayed), `input/` (keyboard, touch, buttons), `services/` (URL, media, window sync), `integrations/` (KaTeX, Mermaid). Only `main.js` wires parts together; parts communicate through the deck's `change` event and named commands.
-- CSS lives in `assets/slides/css/`, one file per concern (tokens, themes, base, typography, code, components, layouts, transitions, animations, controls, overview, presenter, print). Colors belong in `themes.css`, other design tokens in `tokens.css`. The load order is set in `layouts/partials/powerslides/stylesheet.html`.
+- CSS lives in `assets/slides/css/`, one file per concern (tokens, themes, base, typography, code, components, layouts, transitions, animations, controls, overview, presenter, print). Colors belong in `themes.css`, other design tokens in `tokens.css`. The load order is set in `layouts/_partials/powerslides/stylesheet.html`.
 
 ## Efficient Work
 
@@ -28,7 +28,7 @@
 - Preserve the shortcode contract: each slide is a `<section data-slide>` with a stable ID and Markdown content.
 - Prefer semantic HTML, accessible labels, and native controls. Preserve keyboard navigation and existing commands.
 - Keep JavaScript dependency-free and deferred. Hugo's built-in `js.Build` bundles the modules; no Node.js tooling is required. Handle optional elements safely; add a dependency only for a demonstrated need.
-- External libraries are loaded only where needed, from pinned versions with Subresource Integrity. Versions and hashes live in `layouts/partials/powerslides/libraries.html`; the Content-Security-Policy is built in `csp.html` next to it.
+- External libraries are loaded only where needed, from pinned versions with Subresource Integrity. Versions and hashes live in `layouts/_partials/powerslides/libraries.html`; the Content-Security-Policy is built in `csp.html` next to it.
 - Stay compatible with the minimum Hugo version in `hugo.toml` and with the latest release; CI builds with both.
 - Respect `prefers-reduced-motion`; transitions must not obstruct reading or slide navigation.
 

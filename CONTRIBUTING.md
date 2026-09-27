@@ -19,13 +19,14 @@ Changes to the theme show up in the demo right away.
 
 ```text
 layouts/
-├── _default/slides.html        the slide deck page
-├── _default/list.html          lists of decks (home, sections, taxonomies)
-├── _default/_markup/           render hooks: headings, images, links, Mermaid code blocks
-├── partials/powerslides/       head, security policy, external libraries, URL resolution
-└── shortcodes/                 slide, notes, fragments, columns, callout, video, embed…
+├── slides.html                 the slide deck page
+├── single.html                 regular pages, rendered as slide decks
+├── list.html                   lists of decks (home, sections, taxonomies)
+├── _markup/                    render hooks: headings, images, links, Mermaid code blocks
+├── _partials/powerslides/      head, security policy, external libraries, URL resolution
+└── _shortcodes/                slide, notes, fragments, columns, callout, video, embed…
 assets/slides/
-├── css/                        one file per concern; load order in partials/powerslides/stylesheet.html
+├── css/                        one file per concern; load order in _partials/powerslides/stylesheet.html
 └── js/
     ├── main.js                 creates each part and connects them
     ├── core/                   navigation state (Deck), commands, fragments
@@ -66,7 +67,7 @@ Continuous integration runs the tests and builds the demo with the minimum suppo
 
 ## Updating KaTeX or Mermaid
 
-Versions and integrity hashes are in `layouts/partials/powerslides/libraries.html`. For each file, compute the hash and check that the CDN copy matches the npm package:
+Versions and integrity hashes are in `layouts/_partials/powerslides/libraries.html`. For each file, compute the hash and check that the CDN copy matches the npm package:
 
 ```bash
 url=https://cdn.jsdelivr.net/npm/katex@0.18.7/dist/katex.min.js
