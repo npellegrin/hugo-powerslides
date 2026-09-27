@@ -191,7 +191,7 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
   width = 1920           # canvas size in pixels; use 1600 × 1200 for 4:3
   height = 1080
   customCSS = ["css/custom.css"]
-  favicon = "/favicon.svg"  # defaults to the theme's icon
+  favicon = "/favicon.svg"  # browser tab icon (SVG, PNG, or ICO); defaults to the theme's icon
 
   [params.powerslides.colors]
     primary = "#34d399"
@@ -204,7 +204,7 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
     number = true
 ```
 
-`theme`, `transition`, and `colors` can also be set in a page's front matter.
+`theme`, `transition`, `colors`, and `favicon` can also be set in a page's front matter.
 
 Color tokens: `background`, `surface`, `border`, `text`, `muted`, `primary`, `on-primary`, `accent`, `warning`, `code-background`, `code-text`. Each maps to a `--color-*` CSS property. Keep text at a contrast ratio of at least 4.5:1 against `background` and `surface`.
 

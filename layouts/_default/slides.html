@@ -75,7 +75,8 @@
     {{ if .Title }}{{ .Title }}{{ else }}{{ site.Title }}{{ end }}
   </title>
 
-  <link rel="icon" href="{{ with $params.favicon }}{{ partial "powerslides/url.html" (dict "url" .) }}{{ else }}{{ "slides/favicon.svg" | relURL }}{{ end }}">
+  {{/* Page front matter, then site params, then the theme's icon */}}
+  <link rel="icon" href="{{ with .Params.favicon | default $params.favicon }}{{ partial "powerslides/url.html" (dict "url" . "page" $) }}{{ else }}{{ "slides/favicon.svg" | relURL }}{{ end }}">
   <link rel="stylesheet" href="{{ "slides/slides.css" | relURL }}">
   {{ if $math }}
     <link rel="stylesheet" href="{{ $katexBase }}/katex.min.css" integrity="sha384-JctiRyLzXCrSoOOzFlSoWLdyzQl7OrrRnhyeBmzB6ZWtcjccUyc8lCQJqIbs3uQX" crossorigin="anonymous" referrerpolicy="no-referrer">
