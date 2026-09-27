@@ -1,0 +1,8 @@
+{{- /* Renders a shortcode's inner Markdown. Hugo has already run nested shortcodes and turned escaped
+       ones (written with comment markers inside the delimiters) into literal text. A placeholder hides
+       their opening delimiters during this second pass, so they are shown instead of run.
+       Usage: partial "powerslides/inner.html" (dict "inner" .InnerDeindent "page" .Page) */ -}}
+{{- $placeholder := "POWERSLIDESESCAPEDSHORTCODE" }}
+{{- $inner := replaceRE `\{\{([<%])` (printf "%s$1" $placeholder) .inner }}
+{{- $html := .page.RenderString (dict "display" "block") $inner }}
+{{- return (replace $html $placeholder "{{" | safeHTML) }}

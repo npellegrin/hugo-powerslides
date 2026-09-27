@@ -1,4 +1,4 @@
 {{/* Wrap each column in a column shortcode; without them, each top-level block becomes a grid cell. */}}
 <div class="columns columns--{{ .Get "count" | default "2" }}">
-{{ if in .Inner `class="column"` }}{{ .Inner | safeHTML }}{{ else }}{{ .Inner | markdownify }}{{ end }}
+{{ if in .Inner `class="column"` }}{{ .Inner | safeHTML }}{{ else }}{{ partial "powerslides/inner.html" (dict "inner" .InnerDeindent "page" .Page) }}{{ end }}
 </div>

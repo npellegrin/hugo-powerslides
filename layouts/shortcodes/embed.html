@@ -1,11 +1,18 @@
-{{/* External page in an iframe, loaded only while its slide is current or next to save bandwidth and stop playback. */}}
+{{/* External page in an iframe, loaded only while its slide is current or next to save bandwidth and stop playback.
+     A same-origin page could lift its own sandbox if it kept its origin, so only other sites get allow-same-origin
+     (they need it for their own cookies and storage, and stay isolated from the slides by the same-origin policy). */}}
 {{ $ratio := .Get "ratio" | default "16/9" }}
+{{ $src := partial "powerslides/url.html" (dict "url" (.Get "src") "page" .Page) }}
+{{ $host := (urls.Parse $src).Host }}
+{{ $isExternal := false }}
+{{ if and $host (ne $host (urls.Parse site.BaseURL).Host) }}{{ $isExternal = true }}{{ end }}
+{{ $sandbox := .Get "sandbox" | default (cond $isExternal "allow-scripts allow-same-origin allow-popups allow-presentation" "allow-scripts allow-popups allow-presentation") }}
 <div class="embed" style="{{ printf "--embed-ratio: %s;" (replace $ratio "/" " / ") | safeCSS }}">
   <iframe
-    data-src="{{ partial "powerslides/url.html" (dict "url" (.Get "src") "page" .Page) }}"
+    data-src="{{ $src }}"
     title="{{ .Get "title" | default "Embedded content" }}"
-    allow="fullscreen; picture-in-picture; clipboard-write"
+    allow="fullscreen; picture-in-picture"
     referrerpolicy="strict-origin-when-cross-origin"
-    sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+    sandbox="{{ $sandbox }}"
   ></iframe>
 </div>

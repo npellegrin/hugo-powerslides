@@ -530,6 +530,38 @@ caption {
 
 /* Components */
 
+.rule {
+  height: 0.08em;
+  margin: 1em 0;
+  border: 0;
+  border-radius: 1em;
+  background: var(--color-border);
+}
+
+.slide__footnotes {
+  margin-top: 1em;
+  padding-top: 0.5em;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.55em;
+}
+
+.slide__footnotes ol {
+  margin: 0;
+}
+
+.slide__footnotes li + li {
+  margin-top: 0.2em;
+}
+
+.slide__footnotes p {
+  margin: 0;
+}
+
+.footnote-ref {
+  text-decoration: none;
+}
+
 .columns {
   display: grid;
   gap: 2em;

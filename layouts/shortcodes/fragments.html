@@ -1,4 +1,4 @@
 {{/* Reveals each list item or top-level block one step at a time. Styles: up (default), fade, zoom, highlight. */}}
 <div class="fragments" data-fragments="{{ .Get "style" }}">
-{{ .Page.RenderString (dict "display" "block") .InnerDeindent }}
+{{ partial "powerslides/inner.html" (dict "inner" .InnerDeindent "page" .Page) }}
 </div>

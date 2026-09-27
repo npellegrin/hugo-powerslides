@@ -38,7 +38,7 @@
   };
   const fragments = slides.map(collectFragments);
 
-  let currentIndex = indexFromHash();
+  let currentIndex = Math.max(indexFromHash(), 0);
   let mediaIndex = -1;
   let currentStep = 0;
   let isOverview = false;
@@ -75,11 +75,20 @@
     );
   }
 
-  function indexFromHash() {
-    const hash = decodeURIComponent(window.location.hash.slice(1));
-    const index = slides.findIndex((slide) => slide.id === hash);
+  // Returns -1 when the id matches nothing. Anchors inside a slide, such as footnotes, lead to their slide.
+  function indexFromId(id) {
+    const target = id ? document.getElementById(id) : null;
+    const slide = target && target.closest("[data-slide]");
 
-    return index >= 0 ? index : 0;
+    return slide ? slides.indexOf(slide) : -1;
+  }
+
+  function indexFromHash() {
+    try {
+      return indexFromId(decodeURIComponent(window.location.hash.slice(1)));
+    } catch {
+      return -1;
+    }
   }
 
   function clamp(value, minimum, maximum) {
@@ -186,10 +195,14 @@
       });
 
       slide.querySelectorAll("iframe[data-src]").forEach((frame) => {
-        const target = isNear ? frame.dataset.src : "about:blank";
+        if (isNear && !frame.hasAttribute("src")) {
+          frame.setAttribute("src", frame.dataset.src);
+        } else if (!isNear && frame.hasAttribute("src")) {
+          // A fresh iframe unloads the page without navigating to about:blank, which renders in quirks mode.
+          const empty = frame.cloneNode(false);
 
-        if (frame.getAttribute("src") !== target && (isNear || frame.hasAttribute("src"))) {
-          frame.setAttribute("src", target);
+          empty.removeAttribute("src");
+          frame.replaceWith(empty);
         }
       });
     });
@@ -629,6 +642,20 @@
         event.preventDefault();
         render(slides.indexOf(slide), 0);
         setOverview(false);
+        return;
+      }
+
+      // In-page links switch slides instead of letting the browser scroll the canvas.
+      const link = event.target.closest('a[href^="#"]');
+
+      if (link) {
+        const index = indexFromId(decodeURIComponent(link.getAttribute("href").slice(1)));
+
+        event.preventDefault();
+
+        if (index >= 0 && index !== currentIndex) {
+          render(index);
+        }
       }
     });
 
@@ -641,7 +668,13 @@
       updatePresenterNext();
     });
 
-    window.addEventListener("hashchange", () => render(indexFromHash()));
+    window.addEventListener("hashchange", () => {
+      const index = indexFromHash();
+
+      if (index >= 0) {
+        render(index);
+      }
+    });
 
     if (window.ResizeObserver) {
       new ResizeObserver(fit).observe(presentation);

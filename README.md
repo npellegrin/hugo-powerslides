@@ -65,6 +65,10 @@ layout: "slides"
 # Second slide
 ```
 
+Leave a blank line before each `---`: right under a line of text, Markdown reads it as a heading underline and the two slides merge. Hugo prints a warning when this happens. `***` and `___` also separate slides; use `{{</* rule */>}}` for a visible line inside a slide.
+
+Footnotes (`[^1]`) are shown at the bottom of the slide that cites them.
+
 The optional `slide` shortcode at the top of a slide accepts:
 
 | Option       | Description                                                                 |
@@ -111,8 +115,9 @@ The `anim-fade`, `anim-up`, `anim-zoom`, and `anim-slide` classes are different:
 - `figure` (`src`, `alt`, `caption`)
 - `callout` (`type` = `note`, `tip`, or `warning`; optional `title`)
 - `fragments` (`style`), see above
+- `rule`: a visible horizontal line
 - `video` (`src`, `poster`, `caption`, `title`, `autoplay`, `loop`, `controls`): autoplay videos start muted when their slide appears and pause when it is left
-- `embed` (`src`, `title`, `ratio` such as `4/3`): sandboxed iframe, loaded only while its slide is current or next
+- `embed` (`src`, `title`, `ratio` such as `4/3`, `sandbox`): sandboxed iframe, loaded only while its slide is current or next. Other sites keep their own origin (`allow-same-origin`, needed by most players and maps); pages from the same site do not, so they cannot lift the sandbox. Browsers may still warn about `allow-scripts` with `allow-same-origin`: for another site, this is safe. Remember to list the site in `csp.frameSrc`.
 - `notes` for speaker notes, shown in presenter mode (<kbd>P</kbd>)
 
 Markdown tables, code blocks, blockquotes, task lists, `<kbd>`, and `<mark>` are styled.
@@ -186,6 +191,7 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
   width = 1920           # canvas size in pixels; use 1600 × 1200 for 4:3
   height = 1080
   customCSS = ["css/custom.css"]
+  favicon = "/favicon.svg"  # defaults to the theme's icon
 
   [params.powerslides.colors]
     primary = "#34d399"
@@ -224,3 +230,23 @@ To present offline or avoid the CDN, copy the same files and point to them. The 
 ```
 
 Updating a version means updating its hashes in `layouts/_default/slides.html`.
+
+## Content-Security-Policy
+
+Slide pages carry a Content-Security-Policy that lets the browser run only the theme's scripts and the pinned KaTeX and Mermaid files, on the pages that use them. It forbids `eval`, plugins, forms, and frames. Images, media, and connections are limited to the site itself (plus `data:` images).
+
+Allow what your slides need:
+
+```toml
+[params.powerslides.csp]
+  enable = true                                   # set to false to remove the policy
+  frameSrc = ["https://www.youtube-nocookie.com"] # required for the embed shortcode
+  imgSrc = ["https://images.example.com"]
+  mediaSrc = []
+  connectSrc = []
+  scriptSrc = []
+  styleSrc = []
+  fontSrc = []
+```
+
+Styles allow `'unsafe-inline'` because the theme, KaTeX, and Mermaid set inline styles. A `<meta>` policy cannot set `frame-ancestors`; to prevent other sites from framing the slides, send that directive (or `X-Frame-Options`) as an HTTP header from the web server.

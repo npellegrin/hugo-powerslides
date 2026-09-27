@@ -1,3 +1,3 @@
 <div class="column">
-{{ .Page.RenderString (dict "display" "block") .InnerDeindent }}
+{{ partial "powerslides/inner.html" (dict "inner" .InnerDeindent "page" .Page) }}
 </div>
