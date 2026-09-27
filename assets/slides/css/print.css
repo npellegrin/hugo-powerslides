@@ -1,0 +1,69 @@
+/* Print and PDF export: one page per slide, at the canvas size set by @page in the layout. */
+
+@media print {
+  html,
+  body {
+    display: block !important;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .presentation {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    border: 0;
+  }
+
+  .deck {
+    position: static;
+    width: calc(var(--deck-w, 1920) * 1px);
+    height: auto;
+    overflow: visible;
+    transform: none;
+  }
+
+  .slide {
+    position: relative;
+    inset: auto;
+    width: calc(var(--deck-w, 1920) * 1px);
+    height: calc(var(--deck-h, 1080) * 1px);
+    overflow: hidden;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    break-after: page;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide:last-child {
+    break-after: auto;
+  }
+
+  .fragment,
+  .anim-fade,
+  .anim-up,
+  .anim-zoom,
+  .anim-slide {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .controls,
+  .progress,
+  .presenter-bar,
+  .presenter-next,
+  .speaker-notes-panel,
+  .speaker-notes {
+    display: none !important;
+  }
+}

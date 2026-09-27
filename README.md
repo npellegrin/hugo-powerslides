@@ -210,6 +210,13 @@ Color tokens: `background`, `surface`, `border`, `text`, `muted`, `primary`, `on
 
 To create a new theme, define the tokens under a `[data-theme="name"]` selector in a custom stylesheet and set `theme = "name"`. Fonts use `--font-body`, `--font-heading`, and `--font-mono`.
 
+## Customizing the styles and scripts
+
+The theme's CSS and JavaScript live in `assets/slides/` as small files, one per concern. Hugo joins them at build time into one stylesheet and one script, minified in production (`hugo`) and readable during development (`hugo server`). File names include a content hash for caching, and each file is loaded with its own integrity hash.
+
+- To add styles, use `customCSS` (see Configuration).
+- To replace one part, copy its file to the same path in your site, for example `assets/slides/css/themes.css`: Hugo uses the site's copy instead of the theme's.
+
 ## External libraries
 
 The theme itself has no dependency. KaTeX and Mermaid are loaded only on pages that use them, from pinned versions, with [Subresource Integrity](https://developer.mozilla.org/docs/Web/Security/Subresource_Integrity): the browser refuses any file whose hash differs.

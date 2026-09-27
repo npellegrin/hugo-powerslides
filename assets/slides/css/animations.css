@@ -1,0 +1,155 @@
+/* Step-by-step fragments, entrance animations, and reduced-motion overrides. */
+
+/* Fragments: revealed one step at a time (see js/core/deck.js) */
+
+.fragment {
+  opacity: 0;
+  transform: translateY(0.5em);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease,
+    color 300ms ease,
+    background-color 300ms ease;
+}
+
+.fragment.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.fragment--fade {
+  transform: none;
+}
+
+.fragment--zoom {
+  transform: scale(0.8);
+}
+
+.fragment--highlight {
+  width: fit-content;
+  padding-inline: 0.2em;
+  border-radius: 0.2em;
+  opacity: 1;
+  transform: none;
+}
+
+.fragment--highlight.is-visible {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.fragment--highlight.is-visible::marker {
+  color: var(--color-text);
+}
+
+/* Layouts */
+
+/* Entrance animations, played when the slide appears */
+
+.anim-fade,
+.anim-up,
+.anim-zoom,
+.anim-slide {
+  opacity: 0;
+}
+
+.is-active .anim-fade {
+  animation: fade-in 600ms ease 150ms forwards;
+}
+
+.is-active .anim-up {
+  animation: move-up 600ms ease 250ms forwards;
+}
+
+.is-active .anim-zoom {
+  animation: zoom-in 600ms ease 350ms forwards;
+}
+
+.is-active .anim-slide {
+  animation: move-slide 600ms ease 450ms forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes move-up {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes move-slide {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Set while switching to or from the overview, so slides do not animate */
+.is-instant .slide,
+.is-instant .fragment {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+    animation: none !important;
+    transition:
+      opacity 200ms ease,
+      visibility 200ms !important;
+  }
+
+  .slide:not(.is-active) {
+    opacity: 0 !important;
+  }
+
+  .fragment {
+    transform: none;
+    transition: opacity 150ms ease;
+  }
+
+  .anim-fade,
+  .anim-up,
+  .anim-zoom,
+  .anim-slide {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .progress__bar {
+    transition: none;
+  }
+}

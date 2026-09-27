@@ -1,0 +1,148 @@
+/* Presenter mode: current slide, next slide, notes, and timer. */
+
+body.is-presenter {
+  display: grid;
+  grid-template:
+    "bar bar" auto
+    "current next" minmax(0, 1fr)
+    "current notes" minmax(0, 1.3fr)
+    "controls controls" auto / minmax(0, 3fr) minmax(0, 2fr);
+  gap: 0.75rem;
+  height: 100vh;
+  height: 100dvh;
+  padding: 0.75rem;
+  background: var(--color-surface);
+}
+
+body.is-presenter .presentation {
+  grid-area: current;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+body.is-presenter .progress,
+body.is-presenter .controls button[data-action="presenter"] {
+  display: none;
+}
+
+/* Upcoming fragments stay faintly visible so the speaker knows what comes next. */
+body.is-presenter .deck:not(.deck--preview) .fragment:not(.is-visible, .fragment--highlight) {
+  opacity: 0.25;
+}
+
+.presenter-label {
+  margin: 0 0 0.4rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.is-presenter .presenter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: bar;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+.presenter-bar__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.presenter-bar__item .presenter-label {
+  margin: 0;
+}
+
+.presenter-bar time {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+body.is-presenter .presenter-next {
+  display: flex;
+  flex-direction: column;
+  grid-area: next;
+  min-height: 0;
+}
+
+.presenter-next__frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-background);
+}
+
+.deck--preview .slide {
+  transition: none;
+  animation: none;
+}
+
+.deck--preview .embed {
+  display: grid;
+  place-items: center;
+}
+
+.deck--preview .embed::before {
+  content: "Embedded content";
+  color: #ffffff;
+}
+
+.presenter-empty {
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.deck--preview .presenter-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  font-size: 64px;
+}
+
+body.is-presenter .speaker-notes-panel {
+  display: block;
+  grid-area: notes;
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--color-background);
+  font-size: 1.5rem;
+}
+
+body.is-presenter .controls {
+  position: static;
+  grid-area: controls;
+  justify-content: center;
+  background: none;
+  backdrop-filter: none;
+}
+
+@media (max-width: 800px) {
+  body.is-presenter {
+    grid-template:
+      "bar" auto
+      "current" 40vh
+      "next" 25vh
+      "notes" auto
+      "controls" auto / 1fr;
+    height: auto;
+    overflow: auto;
+  }
+
+  .controls button[data-action="presenter"] {
+    display: none;
+  }
+}

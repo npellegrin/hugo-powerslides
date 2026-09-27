@@ -1,0 +1,15 @@
+{{- /* Joins the theme's CSS files, in cascade order, into one fingerprinted stylesheet (minified in production). */ -}}
+{{- $files := slice
+  "tokens" "themes" "base" "typography" "code" "components" "layouts"
+  "transitions" "animations" "controls" "overview" "presenter" "print"
+}}
+{{- $parts := slice }}
+{{- range $files }}
+  {{- $parts = $parts | append (resources.Get (printf "slides/css/%s.css" .)) }}
+{{- end }}
+{{- $css := $parts | resources.Concat "slides/slides.css" }}
+{{- if hugo.IsProduction }}
+  {{- $css = $css | minify }}
+{{- end }}
+{{- $css = $css | fingerprint "sha384" }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">

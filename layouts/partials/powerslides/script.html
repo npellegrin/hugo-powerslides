@@ -1,0 +1,11 @@
+{{- /* Bundles a JavaScript entry point and its modules into one fingerprinted file (minified in production).
+       The code targets current browsers, so modern syntax is kept as written.
+       Usage: partial "powerslides/script.html" "main" */ -}}
+{{- $options := dict
+  "targetPath" (printf "slides/%s.js" (path.Base .))
+  "format" "iife"
+  "target" "esnext"
+  "minify" hugo.IsProduction
+}}
+{{- $js := resources.Get (printf "slides/js/%s.js" .) | js.Build $options | fingerprint "sha384" }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>

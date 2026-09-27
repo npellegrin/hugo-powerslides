@@ -1,0 +1,113 @@
+/* Code blocks and syntax highlighting. */
+
+/* Hugo wraps highlighted code in .highlight and sets the palette inline on <pre>. */
+.highlight {
+  margin: 1em 0;
+}
+
+pre {
+  margin: 1em 0;
+  padding: 0.9em 1.1em;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-code-background);
+  color: var(--color-code-text);
+  font-size: 0.72em;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.highlight pre {
+  margin: 0;
+}
+
+pre code {
+  font-size: inherit;
+}
+
+pre:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Syntax highlighting with theme colors; requires markup.highlight.noClasses = false */
+
+.chroma .line {
+  display: flex;
+}
+
+.chroma .hl {
+  margin-inline: -1.1em;
+  padding-inline: 0.9em 1.1em;
+  border-inline-start: 0.2em solid var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+.chroma .ln,
+.chroma .lnt {
+  margin-inline-end: 1em;
+  color: var(--code-comment);
+  user-select: none;
+}
+
+.chroma .lntable {
+  margin: 0;
+  border: 0;
+  font-size: inherit;
+}
+
+.chroma .lntd {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.chroma :is(.k, .kc, .kd, .kn, .kp, .kr, .ow) {
+  color: var(--code-keyword);
+}
+
+.chroma :is(.kt, .nc, .nn, .ne, .bp) {
+  color: var(--code-type);
+}
+
+.chroma :is(.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss) {
+  color: var(--code-string);
+}
+
+.chroma :is(.c, .ch, .cm, .c1, .cs, .cp, .cpf) {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.chroma :is(.nf, .fm, .nd) {
+  color: var(--code-function);
+}
+
+.chroma :is(.m, .mb, .mf, .mh, .mi, .il, .mo, .no, .nb, .na, .nv, .vc, .vg, .vi) {
+  color: var(--code-number);
+}
+
+.chroma :is(.nt, .gh, .gu) {
+  color: var(--code-tag);
+}
+
+.chroma .gd {
+  color: var(--code-deleted);
+}
+
+.chroma .gi {
+  color: var(--code-inserted);
+}
+
+.chroma .ge {
+  font-style: italic;
+}
+
+.chroma .gs {
+  font-weight: 700;
+}
+
+.chroma .err {
+  text-decoration: wavy underline var(--code-deleted);
+}
