@@ -87,14 +87,52 @@ The optional `slide` shortcode at the top of a slide accepts:
 
 All transitions fall back to a short fade when the system requests reduced motion.
 
+### Step-by-step reveals
+
+Wrap content in `fragments`: each list item, or each top-level block, appears on its own step.
+
+```markdown
+{{</* fragments style="zoom" */>}}
+- First point
+- Second point
+{{</* /fragments */>}}
+```
+
+Styles: `up` (default), `fade`, `zoom`, `highlight`. Any element with the `fragment` class (and optionally `fragment--fade`, etc.) is also a step. Going back into a slide shows all of its steps.
+
+The `anim-fade`, `anim-up`, `anim-zoom`, and `anim-slide` classes are different: they play automatically when the slide appears.
+
 ### Shortcodes
 
 - `columns` (`count` = 2, 3, or 4) containing `column` blocks
 - `figure` (`src`, `alt`, `caption`)
 - `callout` (`type` = `note`, `tip`, or `warning`; optional `title`)
+- `fragments` (`style`), see above
 - `notes` for speaker notes, shown in presenter mode (<kbd>P</kbd>)
 
 Markdown tables, code blocks, blockquotes, task lists, `<kbd>`, and `<mark>` are styled.
+
+## Presenting
+
+| Keys                                          | Action                         |
+| --------------------------------------------- | ------------------------------ |
+| <kbd>→</kbd> <kbd>↓</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd> | Next step or slide |
+| <kbd>←</kbd> <kbd>↑</kbd> <kbd>Page Up</kbd>  | Previous step or slide         |
+| <kbd>Home</kbd> <kbd>End</kbd>                | First or last slide            |
+| Slide number, then <kbd>Enter</kbd>           | Go to that slide               |
+| <kbd>O</kbd> or <kbd>Esc</kbd>                | Overview (arrows, <kbd>Enter</kbd>, or click to pick a slide) |
+| <kbd>F</kbd>                                  | Toggle fullscreen              |
+| <kbd>P</kbd>                                  | Open the presenter window      |
+
+On touch screens, swipe left or right. Page Up and Page Down make most presentation clickers work out of the box.
+
+Slides are drawn on a fixed canvas (1920×1080 by default) scaled to fit the window, so they look the same on a laptop and a projector. On portrait phones, the canvas becomes fluid with a smaller font.
+
+The presenter window stays in sync with the audience window. It shows the current slide with upcoming steps faded, the next slide, the speaker notes, an elapsed-time timer (pause and reset), and the clock.
+
+### Export to PDF
+
+Print the page from the browser and choose **Save as PDF**. Each slide becomes one page at the canvas size, with every step visible and controls hidden. Enable background graphics if the print dialog asks. Chromium-based browsers honor the page size best.
 
 ## Configuration
 
@@ -112,6 +150,8 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
   theme = "dark"         # dark, light, solarized, synthwave, terminal
   transition = "fade"
   progress = true        # progress bar at the top
+  width = 1920           # canvas size in pixels; use 1600 × 1200 for 4:3
+  height = 1080
   customCSS = ["css/custom.css"]
 
   [params.powerslides.colors]

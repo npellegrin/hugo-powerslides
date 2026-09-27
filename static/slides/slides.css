@@ -21,7 +21,10 @@
   --font-heading: var(--font-body);
   --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
   --radius: 0.5rem;
-  --slide-padding: clamp(1.5rem, 6vw, 6rem);
+  /* Sizes below are in canvas pixels (the deck is 1920×1080 by default, then scaled). */
+  --font-size-canvas: 36px;
+  --font-size-base: var(--font-size-canvas);
+  --slide-padding: 2.75em;
   --duration: 450ms;
   --easing: ease;
 }
@@ -112,6 +115,19 @@ body {
   overflow: hidden;
 }
 
+.deck {
+  --deck-scale: 1;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--deck-width, calc(var(--deck-w, 1920) * 1px));
+  height: var(--deck-height, calc(var(--deck-h, 1080) * 1px));
+  overflow: hidden;
+  transform: translate(-50%, -50%) scale(var(--deck-scale));
+  counter-reset: slide;
+}
+
 .slide {
   position: absolute;
   inset: 0;
@@ -121,6 +137,8 @@ body {
   background: var(--color-background);
   color: var(--color-text);
   font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  counter-increment: slide;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -148,14 +166,14 @@ body {
 }
 
 .slide__content {
-  width: min(1100px, 100%);
+  width: 100%;
   max-height: 100%;
   overflow: auto;
   scrollbar-color: var(--color-border) transparent;
   scrollbar-width: thin;
 }
 
-/* Typography and Markdown elements */
+/* Typography and Markdown elements, sized relative to the slide's base font */
 
 h1,
 h2,
@@ -168,13 +186,13 @@ h4 {
 
 h1 {
   margin: 0 0 0.5em;
-  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-size: 2.4em;
   text-shadow: var(--heading-glow);
 }
 
 h2 {
   margin: 0.6em 0 0.4em;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: 1.6em;
 }
 
 h1 + h2 {
@@ -185,22 +203,20 @@ h1 + h2 {
 
 h3 {
   margin: 0.8em 0 0.4em;
-  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+  font-size: 1.25em;
   color: var(--color-primary);
 }
 
 h4 {
   margin: 0.8em 0 0.3em;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-size: 1.1em;
 }
 
 p,
 li,
 dd,
 dt,
-blockquote,
-table {
-  font-size: clamp(1.1rem, 2vw, 1.8rem);
+blockquote {
   line-height: 1.5;
 }
 
@@ -269,7 +285,7 @@ img {
 }
 
 .slide__content img {
-  max-height: 65vh;
+  max-height: 18em;
 }
 
 blockquote {
@@ -330,13 +346,13 @@ kbd {
 
 pre {
   margin: 1em 0;
-  padding: 1em 1.25em;
+  padding: 0.9em 1.1em;
   overflow: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-code-background);
   color: var(--color-code-text);
-  font-size: clamp(0.85rem, 1.4vw, 1.3rem);
+  font-size: 0.72em;
   line-height: 1.5;
   tab-size: 2;
 }
@@ -358,13 +374,15 @@ pre:focus-visible {
 table {
   margin: 1em 0;
   border-collapse: collapse;
+  font-size: 0.9em;
   font-variant-numeric: tabular-nums;
 }
 
 th,
 td {
-  padding: 0.45em 1em;
+  padding: 0.4em 1em;
   border-bottom: 1px solid var(--color-border);
+  line-height: 1.4;
   text-align: start;
   vertical-align: top;
 }
@@ -388,7 +406,7 @@ caption {
 
 .columns {
   display: grid;
-  gap: clamp(1.5rem, 4vw, 3rem);
+  gap: 2em;
   align-items: start;
 }
 
@@ -416,23 +434,23 @@ caption {
 .figure img {
   display: block;
   max-width: 100%;
-  max-height: 65vh;
+  max-height: 18em;
   margin-inline: auto;
 }
 
 .figure figcaption {
-  margin-top: 0.75rem;
+  margin-top: 0.5em;
   color: var(--color-muted);
-  font-size: clamp(1rem, 1.6vw, 1.4rem);
+  font-size: 0.8em;
 }
 
 .callout {
   --callout-color: var(--color-primary);
 
-  margin: 1em 0;
-  padding: 0.75em 1em;
+  margin: 0.75em 0;
+  padding: 0.6em 0.9em;
   border: 1px solid var(--color-border);
-  border-inline-start: 0.35em solid var(--callout-color);
+  border-inline-start: 0.3em solid var(--callout-color);
   border-radius: var(--radius);
   background: var(--color-surface);
 }
@@ -450,7 +468,6 @@ caption {
   align-items: center;
   gap: 0.5em;
   margin: 0 0 0.3em;
-  font-size: clamp(1.1rem, 2vw, 1.8rem);
   font-weight: 700;
 }
 
@@ -473,6 +490,48 @@ caption {
   margin-bottom: 0;
 }
 
+/* Fragments: revealed one step at a time by slides.js */
+
+.fragment {
+  opacity: 0;
+  transform: translateY(0.5em);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease,
+    color 300ms ease,
+    background-color 300ms ease;
+}
+
+.fragment.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.fragment--fade {
+  transform: none;
+}
+
+.fragment--zoom {
+  transform: scale(0.8);
+}
+
+.fragment--highlight {
+  width: fit-content;
+  padding-inline: 0.2em;
+  border-radius: 0.2em;
+  opacity: 1;
+  transform: none;
+}
+
+.fragment--highlight.is-visible {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.fragment--highlight.is-visible::marker {
+  color: var(--color-text);
+}
+
 /* Layouts */
 
 .layout-title .slide__content,
@@ -481,7 +540,7 @@ caption {
 }
 
 .layout-title h1 {
-  font-size: clamp(3rem, 8vw, 7rem);
+  font-size: 3.6em;
 }
 
 .layout-title h1::after {
@@ -497,12 +556,8 @@ caption {
 .layout-center blockquote {
   padding: 0;
   border: 0;
-  font-size: clamp(1.6rem, 4vw, 3.2rem);
+  font-size: 1.75em;
   line-height: 1.3;
-}
-
-.layout-center blockquote p {
-  font-size: inherit;
 }
 
 .layout-center blockquote::before {
@@ -521,11 +576,11 @@ caption {
 }
 
 .layout-section .slide__content {
-  overflow: visible;
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  column-gap: clamp(1.5rem, 4vw, 4rem);
+  column-gap: 1.5em;
+  overflow: visible;
 }
 
 .layout-section .slide__content > * {
@@ -537,7 +592,7 @@ caption {
   grid-row: 1 / span 4;
   color: transparent;
   font-family: var(--font-heading);
-  font-size: clamp(5rem, 16vw, 14rem);
+  font-size: 7em;
   font-weight: 800;
   line-height: 1.2;
   -webkit-text-stroke: 0.03em var(--color-primary);
@@ -610,7 +665,47 @@ caption {
 }
 
 .layout-hero h1 {
-  font-size: clamp(3rem, 9vw, 8rem);
+  font-size: 4em;
+}
+
+/* Compact mode: portrait phones get a fluid canvas instead of a scaled one */
+
+body.is-compact .deck {
+  --font-size-base: 18px;
+}
+
+body.is-compact .columns--2,
+body.is-compact .columns--3,
+body.is-compact .columns--4 {
+  grid-template-columns: 1fr;
+}
+
+body.is-compact .layout-image-left,
+body.is-compact .layout-image-right {
+  grid-template-columns: 1fr;
+  grid-template-rows: 35% 1fr;
+}
+
+body.is-compact .layout-image-right .slide__media {
+  order: 0;
+}
+
+body.is-compact .layout-section .slide__content {
+  grid-template-columns: 1fr;
+}
+
+body.is-compact .layout-section .slide__section-number {
+  grid-row: auto;
+}
+
+body.is-compact .layout-section .slide__content > * {
+  grid-column: 1;
+}
+
+body.is-compact table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* Controls */
@@ -647,7 +742,8 @@ caption {
   font-family: var(--font-body);
 }
 
-.controls button {
+.controls button,
+.presenter-bar button {
   border: 1px solid var(--color-border);
   border-radius: 0.35rem;
   padding: 0.5rem 0.75rem;
@@ -658,14 +754,22 @@ caption {
 }
 
 .controls button:hover,
-.controls button:focus-visible {
+.controls button:focus-visible,
+.presenter-bar button:hover,
+.presenter-bar button:focus-visible {
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
 
-.controls button:focus-visible {
+.controls button:focus-visible,
+.presenter-bar button:focus-visible {
   outline: 3px solid var(--color-text);
   outline-offset: 2px;
+}
+
+.controls button[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 -3px 0 var(--color-primary);
 }
 
 .slide-counter {
@@ -673,8 +777,19 @@ caption {
   font-variant-numeric: tabular-nums;
 }
 
+.goto {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.35rem;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.goto[hidden],
 .speaker-notes,
-.speaker-notes-panel {
+.speaker-notes-panel,
+.presenter-bar,
+.presenter-next {
   display: none;
 }
 
@@ -685,13 +800,13 @@ caption {
 }
 
 .slide--slide {
-  --slide-from: translateX(4rem);
-  --slide-to: translateX(-4rem);
+  --slide-from: translateX(2em);
+  --slide-to: translateX(-2em);
 }
 
 .slide--up {
-  --slide-from: translateY(3rem);
-  --slide-to: translateY(-3rem);
+  --slide-from: translateY(1.5em);
+  --slide-to: translateY(-1.5em);
 }
 
 .slide--zoom {
@@ -710,7 +825,7 @@ caption {
 .slide--blur {
   --duration: 600ms;
 
-  filter: blur(1.5rem);
+  filter: blur(0.6em);
 }
 
 .slide--flip {
@@ -806,7 +921,7 @@ caption {
   }
 }
 
-/* Fragment animations */
+/* Entrance animations, played when the slide appears */
 
 .anim-fade,
 .anim-up,
@@ -877,6 +992,12 @@ caption {
   }
 }
 
+/* Used by slides.js to switch views without animating every slide */
+.is-instant .slide,
+.is-instant .fragment {
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .slide {
     filter: none !important;
@@ -892,6 +1013,11 @@ caption {
     opacity: 0 !important;
   }
 
+  .fragment {
+    transform: none;
+    transition: opacity 150ms ease;
+  }
+
   .anim-fade,
   .anim-up,
   .anim-zoom,
@@ -905,102 +1031,216 @@ caption {
   }
 }
 
-/* Presenter mode */
+/* Overview: every slide as a thumbnail; zoom keeps each canvas's layout intact */
 
-body.is-presenter {
+body.is-overview .presentation {
   overflow: auto;
-  background: var(--color-surface);
 }
 
-body.is-presenter .presentation {
+body.is-overview .deck {
+  --thumb-width: 320;
+
+  position: static;
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, calc(var(--thumb-width) * 1px));
+  justify-content: center;
+  gap: 1.5rem;
+  width: auto;
   height: auto;
+  padding: 1.5rem 1.5rem 6rem;
   overflow: visible;
-  padding: 1rem;
+  transform: none;
 }
 
-body.is-presenter .slide {
+body.is-overview .slide {
+  --font-size-base: var(--font-size-canvas);
+
   position: relative;
-  display: none;
-  min-height: 55vh;
-  border: 1px solid var(--color-border);
+  inset: auto;
+  width: calc(var(--deck-w, 1920) * 1px);
+  height: calc(var(--deck-h, 1080) * 1px);
+  zoom: calc(var(--thumb-width) / var(--deck-w, 1920));
+  outline: 6px solid var(--color-border);
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
   filter: none;
   clip-path: none;
   transform: none;
   transition: none;
   animation: none;
+  cursor: pointer;
 }
 
-body.is-presenter .slide.is-active,
-body.is-presenter .slide.is-next {
+body.is-overview .slide:hover {
+  outline-color: var(--color-muted);
+}
+
+body.is-overview .slide.is-active {
+  outline: 24px solid var(--color-primary);
+  outline-offset: 12px;
+}
+
+body.is-overview .slide::after {
+  content: counter(slide);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  padding: 0.1em 0.5em;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 96px;
+  font-weight: 700;
+}
+
+body.is-overview .slide__content {
+  overflow: hidden;
+}
+
+body.is-overview .fragment,
+body.is-overview :is(.anim-fade, .anim-up, .anim-zoom, .anim-slide) {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+body.is-overview .progress {
+  display: none;
+}
+
+/* Presenter mode */
+
+body.is-presenter {
   display: grid;
+  grid-template:
+    "bar bar" auto
+    "current next" minmax(0, 1fr)
+    "current notes" minmax(0, 1.3fr)
+    "controls controls" auto / minmax(0, 3fr) minmax(0, 2fr);
+  gap: 0.75rem;
+  height: 100vh;
+  height: 100dvh;
+  padding: 0.75rem;
+  background: var(--color-surface);
 }
 
-body.is-presenter .slide.is-next {
-  opacity: 0.65;
-  transform: scale(0.75);
-  transform-origin: top left;
+body.is-presenter .presentation {
+  grid-area: current;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
-body.is-presenter .speaker-notes-panel {
-  display: block;
-  grid-column: 1 / -1;
-  padding: 1rem;
+body.is-presenter .progress,
+body.is-presenter .controls button[data-action="presenter"] {
+  display: none;
+}
+
+/* Upcoming fragments stay faintly visible so the speaker knows what comes next. */
+body.is-presenter .deck:not(.deck--preview) .fragment:not(.is-visible, .fragment--highlight) {
+  opacity: 0.25;
+}
+
+.presenter-label {
+  margin: 0 0 0.4rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.is-presenter .presenter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: bar;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+.presenter-bar__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.presenter-bar__item .presenter-label {
+  margin: 0;
+}
+
+.presenter-bar time {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+body.is-presenter .presenter-next {
+  display: flex;
+  flex-direction: column;
+  grid-area: next;
+  min-height: 0;
+}
+
+.presenter-next__frame {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-background);
 }
 
-body.is-presenter .progress {
-  display: none;
+.deck--preview .slide {
+  transition: none;
+  animation: none;
+}
+
+.presenter-empty {
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.deck--preview .presenter-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  font-size: 64px;
+}
+
+body.is-presenter .speaker-notes-panel {
+  display: block;
+  grid-area: notes;
+  min-height: 0;
+  overflow: auto;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  background: var(--color-background);
+  font-size: 1.5rem;
 }
 
 body.is-presenter .controls {
-  position: sticky;
-  bottom: 1rem;
+  position: static;
+  grid-area: controls;
   justify-content: center;
+  background: none;
+  backdrop-filter: none;
 }
 
 @media (max-width: 800px) {
-  body.is-presenter .presentation {
-    grid-template-columns: 1fr;
-  }
-
-  .columns--2,
-  .columns--3,
-  .columns--4 {
-    grid-template-columns: 1fr;
-  }
-
-  .layout-image-left,
-  .layout-image-right {
-    grid-template-columns: 1fr;
-    grid-template-rows: 35vh 1fr;
-  }
-
-  .layout-image-right .slide__media {
-    order: 0;
-  }
-
-  .layout-section .slide__content {
-    grid-template-columns: 1fr;
-  }
-
-  .layout-section .slide__section-number {
-    grid-row: auto;
-  }
-
-  .layout-section .slide__content > * {
-    grid-column: 1;
-  }
-
-  table {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
+  body.is-presenter {
+    grid-template:
+      "bar" auto
+      "current" 40vh
+      "next" 25vh
+      "notes" auto
+      "controls" auto / 1fr;
+    height: auto;
+    overflow: auto;
   }
 
   .controls button[data-action="presenter"] {
@@ -1008,28 +1248,71 @@ body.is-presenter .controls {
   }
 }
 
+/* Print and PDF export: one page per slide, at the canvas size set by @page in the layout */
+
 @media print {
   html,
-  body,
-  .presentation {
+  body {
+    display: block !important;
+    width: auto;
     height: auto;
     overflow: visible;
+    padding: 0;
+  }
+
+  .presentation {
+    width: auto;
+    height: auto;
+    overflow: visible;
+    border: 0;
+  }
+
+  .deck {
+    position: static;
+    width: calc(var(--deck-w, 1920) * 1px);
+    height: auto;
+    overflow: visible;
+    transform: none;
   }
 
   .slide {
     position: relative;
-    min-height: 100vh;
-    opacity: 1;
-    visibility: visible;
-    filter: none;
-    clip-path: none;
-    transform: none;
+    inset: auto;
+    width: calc(var(--deck-w, 1920) * 1px);
+    height: calc(var(--deck-h, 1080) * 1px);
+    overflow: hidden;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
     break-after: page;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .slide:last-child {
+    break-after: auto;
+  }
+
+  .fragment,
+  .anim-fade,
+  .anim-up,
+  .anim-zoom,
+  .anim-slide {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
   }
 
   .controls,
   .progress,
+  .presenter-bar,
+  .presenter-next,
+  .speaker-notes-panel,
   .speaker-notes {
     display: none !important;
   }

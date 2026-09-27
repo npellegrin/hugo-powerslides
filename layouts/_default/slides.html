@@ -1,7 +1,9 @@
 {{- $params := site.Params.powerslides | default dict }}
 {{- $theme := .Params.theme | default ($params.theme | default "dark") }}
 {{- $defaultTransition := .Params.transition | default ($params.transition | default "fade") }}
-{{- $colors := merge ($params.colors | default dict) (.Params.colors | default dict) -}}
+{{- $colors := merge ($params.colors | default dict) (.Params.colors | default dict) }}
+{{- $width := $params.width | default 1920 }}
+{{- $height := $params.height | default 1080 -}}
 <!doctype html>
 <html lang="{{ site.Language.Lang | default "fr" }}" data-theme="{{ $theme }}">
 <head>
@@ -16,6 +18,8 @@
   {{ range $params.customcss }}
     <link rel="stylesheet" href="{{ . | relURL }}">
   {{ end }}
+  {{/* One printed page per slide, at the canvas size */}}
+  <style>@page { size: {{ $width }}px {{ $height }}px; margin: 0; }</style>
   {{ with $colors }}
     {{ $css := "" }}
     {{ range $name, $value := . }}
@@ -30,11 +34,33 @@
     <div class="progress" aria-hidden="true"><span class="progress__bar" data-progress></span></div>
   {{ end }}
 
+  <header class="presenter-bar" data-presenter-bar hidden>
+    <span class="presenter-bar__item">
+      <span class="presenter-label">Elapsed</span>
+      <time data-timer>00:00</time>
+    </span>
+    <button type="button" data-action="timer-toggle" aria-pressed="false">Pause</button>
+    <button type="button" data-action="timer-reset">Reset</button>
+    <span class="presenter-bar__item">
+      <span class="presenter-label">Clock</span>
+      <time data-clock>--:--</time>
+    </span>
+    <span class="presenter-bar__item" data-presenter-position></span>
+  </header>
+
   <main
     id="presentation"
     class="presentation"
     data-title="{{ .Title | htmlEscape }}"
   >
+    {{/* Slides are laid out on a fixed canvas that slides.js scales to fit the window */}}
+    <div
+      class="deck"
+      data-deck
+      data-width="{{ $width }}"
+      data-height="{{ $height }}"
+      style="{{ printf "--deck-w: %v; --deck-h: %v;" $width $height | safeCSS }}"
+    >
     {{/* Slides are separated by a Markdown horizontal rule (---); an optional */}}
     {{/* {{< slide ... >}} marker at the top of a slide sets its options (see the slide shortcode) */}}
     {{ $content := replaceRE `<hr\s*/?>` "<hr>" .Content }}
@@ -78,12 +104,19 @@
         </div>
       </section>
     {{ end }}
-
-    {{/* Populated by slides.js with the current slide's [data-notes] title and content, shown only in presenter mode */}}
-    <aside class="speaker-notes-panel" data-notes-panel hidden>
-      <div data-notes-panel-content></div>
-    </aside>
+    </div>
   </main>
+
+  {{/* Presenter mode only: slides.js fills the next-slide preview and the current slide's notes */}}
+  <aside class="presenter-next" data-presenter-next aria-label="Next slide" hidden>
+    <p class="presenter-label">Next</p>
+    <div class="presenter-next__frame" data-next-frame></div>
+  </aside>
+
+  <aside class="speaker-notes-panel" data-notes-panel aria-label="Speaker notes" hidden>
+    <p class="presenter-label">Notes</p>
+    <div data-notes-panel-content></div>
+  </aside>
 
   <nav class="controls" aria-label="Navigation">
     <button type="button" data-action="previous" aria-label="Previous slide">
@@ -96,8 +129,14 @@
       <span data-total-slides>1</span>
     </span>
 
+    <span class="goto" data-goto aria-live="polite" hidden></span>
+
     <button type="button" data-action="next" aria-label="Next slide">
       →
+    </button>
+
+    <button type="button" data-action="overview" aria-label="Overview" aria-pressed="false">
+      ▦
     </button>
 
     <button type="button" data-action="fullscreen" aria-label="Fullscreen">
