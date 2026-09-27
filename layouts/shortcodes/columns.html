@@ -1,3 +1,4 @@
+{{/* Wrap each column in a column shortcode; without them, each top-level block becomes a grid cell. */}}
 <div class="columns columns--{{ .Get "count" | default "2" }}">
-  {{ .Inner | markdownify }}
+{{ if in .Inner `class="column"` }}{{ .Inner | safeHTML }}{{ else }}{{ .Inner | markdownify }}{{ end }}
 </div>

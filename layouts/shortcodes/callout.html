@@ -1,0 +1,12 @@
+{{/* Types: note, tip, warning. The icon and title keep the type readable without relying on color. */}}
+{{ $type := .Get "type" | default "note" }}
+{{ $icons := dict "note" "i" "tip" "★" "warning" "!" }}
+<aside class="callout callout--{{ $type }}" role="note">
+  <p class="callout__title">
+    <span class="callout__icon" aria-hidden="true">{{ index $icons $type | default "i" }}</span>
+    {{ .Get "title" | default (title $type) }}
+  </p>
+  <div class="callout__content">
+    {{ .Page.RenderString (dict "display" "block") .InnerDeindent }}
+  </div>
+</aside>

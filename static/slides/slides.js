@@ -19,6 +19,7 @@
   const totalElement = document.querySelector("[data-total-slides]");
   const notesPanel = document.querySelector("[data-notes-panel]");
   const notesPanelContent = document.querySelector("[data-notes-panel-content]");
+  const progressBar = document.querySelector("[data-progress]");
   const channel = "clean-hugo-slides";
 
   let currentIndex = getInitialIndex();
@@ -42,6 +43,7 @@
 
     slides.forEach((slide, slideIndex) => {
       slide.classList.toggle("is-active", slideIndex === currentIndex);
+      slide.classList.toggle("is-past", slideIndex < currentIndex);
       slide.classList.toggle(
         "is-next",
         slideIndex === currentIndex + 1
@@ -49,6 +51,11 @@
     });
 
     currentElement.textContent = String(currentIndex + 1);
+
+    if (progressBar) {
+      const progress = slides.length > 1 ? currentIndex / (slides.length - 1) : 1;
+      progressBar.style.transform = `scaleX(${progress})`;
+    }
 
     const activeSlide = slides[currentIndex];
 
@@ -128,12 +135,17 @@
 
   function registerEvents() {
     document.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowRight" || event.key === " ") {
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      // PageDown and PageUp are what most presentation clickers send.
+      if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(event.key)) {
         event.preventDefault();
         goNext();
       }
 
-      if (event.key === "ArrowLeft") {
+      if (["ArrowLeft", "ArrowUp", "PageUp"].includes(event.key)) {
         event.preventDefault();
         goPrevious();
       }

@@ -1,0 +1,2 @@
+{{/* Headings get no generated id: slide sections own the anchors, and duplicate ids would break direct links. */}}
+<h{{ .Level }}{{ range $key, $value := .Attributes }}{{ if ne $key "id" }} {{ $key | safeHTMLAttr }}="{{ $value }}"{{ end }}{{ end }}>{{ .Text | safeHTML }}</h{{ .Level }}>
