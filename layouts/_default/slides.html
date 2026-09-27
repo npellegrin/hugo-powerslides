@@ -3,7 +3,20 @@
 {{- $defaultTransition := .Params.transition | default ($params.transition | default "fade") }}
 {{- $colors := merge ($params.colors | default dict) (.Params.colors | default dict) }}
 {{- $width := $params.width | default 1920 }}
-{{- $height := $params.height | default 1080 -}}
+{{- $height := $params.height | default 1080 }}
+{{- $footer := merge ($params.footer | default dict) (.Params.footer | default dict) }}
+{{- /* Rendering content first lets render hooks flag what the page needs (see render-codeblock-mermaid.html) */}}
+{{- $content := .Content }}
+{{- $math := false }}
+{{- if isset .Params "math" }}
+  {{- $math = .Params.math }}
+{{- else }}
+  {{- $math = gt (len (findRE `\$\$|\\\(|\\\[` $content 1)) 0 }}
+{{- end }}
+{{- $mermaid := .Store.Get "powerslides-mermaid" }}
+{{- /* Pinned versions with Subresource Integrity; the base URLs can point to self-hosted copies of the same files */}}
+{{- $katexBase := $params.katexurl | default "https://cdn.jsdelivr.net/npm/katex@0.18.7/dist" }}
+{{- $mermaidURL := $params.mermaidurl | default "https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js" -}}
 <!doctype html>
 <html lang="{{ site.Language.Lang | default "fr" }}" data-theme="{{ $theme }}">
 <head>
@@ -15,6 +28,9 @@
   </title>
 
   <link rel="stylesheet" href="{{ "slides/slides.css" | relURL }}">
+  {{ if $math }}
+    <link rel="stylesheet" href="{{ $katexBase }}/katex.min.css" integrity="sha384-JctiRyLzXCrSoOOzFlSoWLdyzQl7OrrRnhyeBmzB6ZWtcjccUyc8lCQJqIbs3uQX" crossorigin="anonymous" referrerpolicy="no-referrer">
+  {{ end }}
   {{ range $params.customcss }}
     <link rel="stylesheet" href="{{ . | relURL }}">
   {{ end }}
@@ -63,14 +79,14 @@
     >
     {{/* Slides are separated by a Markdown horizontal rule (---); an optional */}}
     {{/* {{< slide ... >}} marker at the top of a slide sets its options (see the slide shortcode) */}}
-    {{ $content := replaceRE `<hr\s*/?>` "<hr>" .Content }}
+    {{ $content = replaceRE `<hr\s*/?>` "<hr>" $content }}
     {{ $sectionNumber := 0 }}
     {{ range $index, $part := split $content "<hr>" }}
       {{ $meta := dict "id" (printf "slide-%d" (add $index 1)) "transition" $defaultTransition "layout" "default" }}
       {{ $body := $part }}
       {{ with index (findRE `<div class="slide-meta"[^>]*></div>` $part 1) 0 }}
         {{ $tag := . }}
-        {{ range $key := slice "id" "transition" "layout" "image" "alt" "theme" "class" }}
+        {{ range $key := slice "id" "transition" "layout" "image" "alt" "theme" "class" "background" "background-image" "background-dim" }}
           {{ with index (findRE (printf ` data-%s="[^"]*"` $key) $tag 1) 0 }}
             {{ with replaceRE `^[^"]*"([^"]*)"$` "$1" . | htmlUnescape }}
               {{ $meta = merge $meta (dict $key .) }}
@@ -90,7 +106,16 @@
         data-transition="{{ $meta.transition }}"
         data-layout="{{ $layout }}"
         {{ with $meta.theme }}data-theme="{{ . }}"{{ end }}
+        {{ $style := "" }}
+        {{ with $meta.background }}{{ $style = printf "--slide-background: %s;" . }}{{ end }}
+        {{ with index $meta "background-dim" }}{{ $style = printf "%s --background-dim: %s;" $style . }}{{ end }}
+        {{ with $style }}style="{{ . | safeCSS }}"{{ end }}
       >
+        {{ with index $meta "background-image" }}
+          <div class="slide__background" aria-hidden="true">
+            <img src="{{ . | relURL }}" alt="">
+          </div>
+        {{ end }}
         {{ with $meta.image }}
           <figure class="slide__media">
             <img src="{{ . | relURL }}" alt="{{ $meta.alt | default "" }}">
@@ -102,6 +127,17 @@
           {{ end }}
           {{ $body | safeHTML }}
         </div>
+        {{ if or $footer.text $footer.logo (ne $footer.number false) }}
+          <footer class="slide__footer">
+            {{ with $footer.logo }}
+              <img class="slide__footer-logo" src="{{ . | relURL }}" alt="{{ $footer.logoalt | default "" }}">
+            {{ end }}
+            <span class="slide__footer-text">{{ with $footer.text }}{{ . | markdownify }}{{ end }}</span>
+            {{ if ne $footer.number false }}
+              <span class="slide__footer-number">{{ add $index 1 }}</span>
+            {{ end }}
+          </footer>
+        {{ end }}
       </section>
     {{ end }}
     </div>
@@ -149,5 +185,14 @@
   </nav>
 
   <script src="{{ "slides/slides.js" | relURL }}" defer></script>
+  {{ if $math }}
+    <script src="{{ $katexBase }}/katex.min.js" integrity="sha384-+7Keh381hSkXmXqnjC0JBM/kzsN6TFj+wMKychSLjTvJ8/0ElMde2uKl8i6p6Buj" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="{{ $katexBase }}/contrib/auto-render.min.js" integrity="sha384-bjyGPfbij8/NDKJhSGZNP/khQVgtHUE5exjm4Ydllo42FwIgYsdLO2lXGmRBf5Mz" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="{{ "slides/math.js" | relURL }}" defer></script>
+  {{ end }}
+  {{ if $mermaid }}
+    <script src="{{ $mermaidURL }}" integrity="sha384-EOXBFmc3gx5mb+vn0vPvvGqACToJD24hhacX5Yx+8NUUQrHIle/Qi5Bg9o3zKwW2" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="{{ "slides/diagrams.js" | relURL }}" defer></script>
+  {{ end }}
 </body>
 </html>

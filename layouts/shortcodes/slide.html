@@ -1,3 +1,4 @@
 {{/* Marks the start of a new slide; the layout reads and strips this marker when splitting content on ---.
-     Options: id, transition, layout, image, alt, theme, class. Empty options fall back to page and site defaults. */}}
-<div class="slide-meta" data-id="{{ .Get "id" }}" data-transition="{{ .Get "transition" }}" data-layout="{{ .Get "layout" }}" data-image="{{ .Get "image" }}" data-alt="{{ .Get "alt" }}" data-theme="{{ .Get "theme" }}" data-class="{{ .Get "class" }}" hidden></div>
+     Options: id, transition, layout, image, alt, theme, class, background, background-image, background-dim.
+     Empty options fall back to page and site defaults. */}}
+<div class="slide-meta" data-id="{{ .Get "id" }}" data-transition="{{ .Get "transition" }}" data-layout="{{ .Get "layout" }}" data-image="{{ .Get "image" }}" data-alt="{{ .Get "alt" }}" data-theme="{{ .Get "theme" }}" data-class="{{ .Get "class" }}" data-background="{{ .Get "background" }}" data-background-image="{{ .Get "background-image" }}" data-background-dim="{{ .Get "background-dim" }}" hidden></div>

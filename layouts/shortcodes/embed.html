@@ -1,0 +1,11 @@
+{{/* External page in an iframe, loaded only while its slide is current or next to save bandwidth and stop playback. */}}
+{{ $ratio := .Get "ratio" | default "16/9" }}
+<div class="embed" style="{{ printf "--embed-ratio: %s;" (replace $ratio "/" " / ") | safeCSS }}">
+  <iframe
+    data-src="{{ .Get "src" }}"
+    title="{{ .Get "title" | default "Embedded content" }}"
+    allow="fullscreen; picture-in-picture; clipboard-write"
+    referrerpolicy="strict-origin-when-cross-origin"
+    sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+  ></iframe>
+</div>

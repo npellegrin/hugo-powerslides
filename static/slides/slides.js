@@ -39,6 +39,7 @@
   const fragments = slides.map(collectFragments);
 
   let currentIndex = indexFromHash();
+  let mediaIndex = -1;
   let currentStep = 0;
   let isOverview = false;
   let isPrinting = false;
@@ -133,6 +134,7 @@
 
     updateNotesPanel(activeSlide);
     updatePresenterNext();
+    updateMedia();
 
     if (activeSlide.id) {
       history.replaceState(null, "", `#${activeSlide.id}`);
@@ -157,6 +159,40 @@
     } else if (currentIndex > 0) {
       render(currentIndex - 1, Infinity);
     }
+  }
+
+  // Media: videos play and pause with their slide; embeds load only near the current slide.
+
+  function updateMedia() {
+    const slideChanged = mediaIndex !== currentIndex;
+
+    mediaIndex = currentIndex;
+
+    slides.forEach((slide, slideIndex) => {
+      const isCurrent = slideIndex === currentIndex && !isOverview;
+      const isNear = slideIndex === currentIndex || slideIndex === currentIndex + 1;
+
+      slide.querySelectorAll("video, audio").forEach((media) => {
+        // The audience window plays the sound; the presenter window stays silent.
+        if (isPresenter) {
+          media.muted = true;
+        }
+
+        if (!isCurrent) {
+          media.pause();
+        } else if (slideChanged && media.hasAttribute("data-autoplay")) {
+          media.play().catch(() => {});
+        }
+      });
+
+      slide.querySelectorAll("iframe[data-src]").forEach((frame) => {
+        const target = isNear ? frame.dataset.src : "about:blank";
+
+        if (frame.getAttribute("src") !== target && (isNear || frame.hasAttribute("src"))) {
+          frame.setAttribute("src", target);
+        }
+      });
+    });
   }
 
   // Scaling
@@ -215,6 +251,8 @@
     if (overviewButton) {
       overviewButton.setAttribute("aria-pressed", String(enabled));
     }
+
+    updateMedia();
 
     if (enabled) {
       slides[currentIndex].scrollIntoView({ block: "center" });
@@ -319,7 +357,16 @@
 
     clone.removeAttribute("id");
     clone.removeAttribute("data-slide");
-    clone.querySelectorAll("[id]").forEach((element) => element.removeAttribute("id"));
+    // SVG ids (diagram markers, gradients) stay: the clone's references must still resolve.
+    clone.querySelectorAll("[id]:not(svg *)").forEach((element) => element.removeAttribute("id"));
+    clone.querySelectorAll("iframe").forEach((frame) => {
+      frame.removeAttribute("src");
+      frame.removeAttribute("data-src");
+    });
+    clone.querySelectorAll("video, audio").forEach((media) => {
+      media.removeAttribute("data-autoplay");
+      media.muted = true;
+    });
     clone.classList.remove("is-past");
     clone.classList.add("is-active");
     clone.querySelectorAll(".fragment").forEach((fragment) => {
@@ -538,6 +585,20 @@
     });
   }
 
+  function registerIdle() {
+    let idleTimeout;
+
+    document.addEventListener("pointermove", (event) => {
+      if (event.pointerType !== "mouse") {
+        return;
+      }
+
+      document.body.classList.remove("is-idle");
+      clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(() => document.body.classList.add("is-idle"), 2500);
+    });
+  }
+
   function registerEvents() {
     const actions = {
       next,
@@ -572,6 +633,13 @@
     });
 
     registerTouch();
+    registerIdle();
+
+    // Math and diagrams render asynchronously; refresh the copies shown in presenter mode.
+    document.addEventListener("powerslides:rendered", () => {
+      updateNotesPanel(slides[currentIndex]);
+      updatePresenterNext();
+    });
 
     window.addEventListener("hashchange", () => render(indexFromHash()));
 

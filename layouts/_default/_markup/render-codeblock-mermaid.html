@@ -1,0 +1,3 @@
+{{/* Flags the page so the slides layout loads Mermaid only when a diagram is present. */}}
+{{ .Page.Store.Set "powerslides-mermaid" true }}
+<pre class="mermaid">{{ .Inner }}</pre>

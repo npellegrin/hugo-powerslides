@@ -1,0 +1,17 @@
+{{/* Local video. With autoplay, it plays (muted) when its slide is shown and pauses when the slide is left. */}}
+{{ $autoplay := eq (.Get "autoplay") "true" }}
+<figure class="media">
+  <video
+    src="{{ .Get "src" | relURL }}"
+    {{ with .Get "poster" }}poster="{{ . | relURL }}"{{ end }}
+    {{ with .Get "title" }}aria-label="{{ . }}"{{ end }}
+    {{ if ne (.Get "controls") "false" }}controls{{ end }}
+    {{ if eq (.Get "loop") "true" }}loop{{ end }}
+    {{ if $autoplay }}muted data-autoplay{{ end }}
+    playsinline
+    preload="metadata"
+  ></video>
+  {{ with .Get "caption" }}
+    <figcaption>{{ . }}</figcaption>
+  {{ end }}
+</figure>

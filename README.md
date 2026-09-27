@@ -75,7 +75,10 @@ The optional `slide` shortcode at the top of a slide accepts:
 | `alt`        | Alternative text for `image`; leave empty for decorative images.            |
 | `transition` | See below. Defaults to the page, then site setting.                         |
 | `theme`      | Color theme for this slide only.                                            |
-| `class`      | Extra CSS classes.                                                          |
+| `class`      | Extra CSS classes (`no-footer` hides the footer).                           |
+| `background` | Background color (any CSS color); combine with `theme` for matching text.   |
+| `background-image` | Background image, tinted with the theme background.                  |
+| `background-dim` | Tint opacity over the background image, from 0 to 1 (default 0.75).     |
 
 `section` slides are numbered automatically.
 
@@ -108,9 +111,21 @@ The `anim-fade`, `anim-up`, `anim-zoom`, and `anim-slide` classes are different:
 - `figure` (`src`, `alt`, `caption`)
 - `callout` (`type` = `note`, `tip`, or `warning`; optional `title`)
 - `fragments` (`style`), see above
+- `video` (`src`, `poster`, `caption`, `title`, `autoplay`, `loop`, `controls`): autoplay videos start muted when their slide appears and pause when it is left
+- `embed` (`src`, `title`, `ratio` such as `4/3`): sandboxed iframe, loaded only while its slide is current or next
 - `notes` for speaker notes, shown in presenter mode (<kbd>P</kbd>)
 
 Markdown tables, code blocks, blockquotes, task lists, `<kbd>`, and `<mark>` are styled.
+
+### Code, math, and diagrams
+
+- **Code** follows the slide theme when Hugo emits CSS classes (`noClasses = false`, see below). Use `hl_lines` to highlight lines: ```` ```js {hl_lines=[2]} ````. With Hugo's default inline colors, the chosen `markup.highlight.style` applies instead.
+- **Math**: write `\( … \)` inline and `$$ … $$` or `\[ … \]` for blocks. KaTeX loads only when a page contains these delimiters; force it with `math: true` or `math: false` in front matter. It needs the Goldmark passthrough extension (see below).
+- **Diagrams**: a ```` ```mermaid ```` code block becomes a Mermaid diagram in the slide's colors. Mermaid loads only on pages that contain one.
+
+### Footer
+
+A footer with the slide number is shown on every slide except `title` and `hero` layouts. Add a text and a logo in the configuration below; set `number = false` to remove the number. Hide it on one slide with `class="no-footer"`.
 
 ## Presenting
 
@@ -143,8 +158,16 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
 [markup.goldmark.renderer]
   unsafe = true
 
+# Emits CSS classes so code colors follow the theme.
 [markup.highlight]
-  style = "github-dark"
+  noClasses = false
+
+# Required for math: leaves LaTeX untouched for KaTeX.
+[markup.goldmark.extensions.passthrough]
+  enable = true
+  [markup.goldmark.extensions.passthrough.delimiters]
+    block = [['\[', '\]'], ['$$', '$$']]
+    inline = [['\(', '\)']]
 
 [params.powerslides]
   theme = "dark"         # dark, light, solarized, synthwave, terminal
@@ -157,6 +180,12 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
   [params.powerslides.colors]
     primary = "#34d399"
     on-primary = "#022c22"
+
+  [params.powerslides.footer]
+    text = "Jane Doe · Conference 2026"   # Markdown allowed
+    logo = "/images/logo.svg"
+    logoAlt = ""                           # empty when the logo is decorative
+    number = true
 ```
 
 `theme`, `transition`, and `colors` can also be set in a page's front matter.
@@ -164,3 +193,24 @@ Hugo does not merge `markup` settings from themes, so set them in the site's `hu
 Color tokens: `background`, `surface`, `border`, `text`, `muted`, `primary`, `on-primary`, `accent`, `warning`, `code-background`, `code-text`. Each maps to a `--color-*` CSS property. Keep text at a contrast ratio of at least 4.5:1 against `background` and `surface`.
 
 To create a new theme, define the tokens under a `[data-theme="name"]` selector in a custom stylesheet and set `theme = "name"`. Fonts use `--font-body`, `--font-heading`, and `--font-mono`.
+
+## External libraries
+
+The theme itself has no dependency. KaTeX and Mermaid are loaded only on pages that use them, from pinned versions, with [Subresource Integrity](https://developer.mozilla.org/docs/Web/Security/Subresource_Integrity): the browser refuses any file whose hash differs.
+
+| Library | Version | Files                                                        |
+| ------- | ------- | ------------------------------------------------------------ |
+| KaTeX   | 0.18.7  | `katex.min.css`, `katex.min.js`, `contrib/auto-render.min.js` |
+| Mermaid | 11.17.2 | `mermaid.min.js` (single-file build, so the hash covers all the code) |
+
+The files are served by jsDelivr from the npm packages. Before pinning, each file was checked to be byte-identical to the npm tarball, and each tarball against the registry's integrity hash. Mermaid is published with an npm provenance attestation from its GitHub repository. Neither version had a known security advisory. Mermaid runs with `securityLevel: "strict"`, and KaTeX with its default `trust: false`.
+
+To present offline or avoid the CDN, copy the same files and point to them. The hashes still apply, so only these exact versions will load:
+
+```toml
+[params.powerslides]
+  katexURL = "/vendor/katex"                  # folder containing katex.min.css, katex.min.js, contrib/
+  mermaidURL = "/vendor/mermaid.min.js"
+```
+
+Updating a version means updating its hashes in `layouts/_default/slides.html`.
