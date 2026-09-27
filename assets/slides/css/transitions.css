@@ -59,6 +59,15 @@
   clip-path: inset(0 100% 0 0);
 }
 
+/* Active shapes must match the hidden ones: clip-path cannot animate to none. */
+.slide--iris.is-active {
+  clip-path: circle(75% at 50% 50%);
+}
+
+.slide--wipe.is-active {
+  clip-path: inset(0);
+}
+
 .slide--iris.is-active,
 .slide--wipe.is-active {
   transition:
