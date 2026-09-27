@@ -2,7 +2,7 @@
 {{- $params := site.Params.powerslides | default dict }}
 {{- $theme := .Params.theme | default ($params.theme | default "dark") -}}
 <!doctype html>
-<html lang="{{ site.Language.LanguageCode | default site.Language.Lang }}" data-theme="{{ $theme }}">
+<html lang="{{ site.Language.Locale | default site.Language.Lang }}" data-theme="{{ $theme }}">
 <head>
   {{ partial "powerslides/head.html" (dict
     "page" .
@@ -37,7 +37,7 @@
               <p class="deck-card__description">{{ . }}</p>
             {{ end }}
             <p class="deck-card__meta">
-              {{ if .IsNode }}
+              {{ if .IsBranch }}
                 <span>Collection · {{ len .Pages }} {{ cond (eq (len .Pages) 1) "item" "items" }}</span>
               {{ else }}
                 {{ $slideCount := add (len (findRE `<hr\s*/?>` .Content)) 1 }}

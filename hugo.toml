@@ -2,5 +2,5 @@
 [module]
   [module.hugoVersion]
     # Oldest version tested in CI (see .github/workflows/ci.yml). The standard edition is enough.
-    min = "0.123.0"
+    min = "0.166.0"
     extended = false

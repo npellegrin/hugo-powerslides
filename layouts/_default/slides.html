@@ -16,7 +16,7 @@
 {{- $mermaid := .Store.Get "powerslides-mermaid" }}
 {{- partial "powerslides/separator-check.html" . -}}
 <!doctype html>
-<html lang="{{ site.Language.LanguageCode | default site.Language.Lang }}" data-theme="{{ $theme }}">
+<html lang="{{ site.Language.Locale | default site.Language.Lang }}" data-theme="{{ $theme }}">
 <head>
   {{ partial "powerslides/head.html" (dict
     "page" .

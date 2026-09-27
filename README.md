@@ -15,7 +15,7 @@ A full-featured Markdown presentation theme for Hugo: layouts, transitions, step
 
 ## Quick start
 
-You need [Hugo](https://gohugo.io/installation/) 0.123 or later (the standard edition is enough), plus Go and Git for Hugo Modules.
+You need [Hugo](https://gohugo.io/installation/) 0.166 or later (the standard edition is enough), plus Go and Git for Hugo Modules.
 
 **1. Create a site and add the theme**
 
@@ -28,7 +28,7 @@ Replace the content of `hugo.toml` with:
 
 ```toml
 title = "My talks"
-languageCode = "en"
+locale = "en"
 
 [module]
   [[module.imports]]
