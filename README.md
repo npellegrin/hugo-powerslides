@@ -2,286 +2,599 @@
 
 A full-featured Markdown presentation theme for Hugo: layouts, transitions, step-by-step reveals, presenter mode, PDF export, color themes, math, and diagrams.
 
-It needs no build tooling beyond Hugo and no required front-end dependency: KaTeX and Mermaid load only on pages that use them. The code is split into small CSS files and JavaScript modules, one per concern, with unit tests, so that it stays readable despite its scope.
+**[See the demo](https://npellegrin.github.io/hugo-powerslides-demo/)** · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
 
-[Demo](https://npellegrin.github.io/hugo-powerslides-demo/) · [Changelog](CHANGELOG.md)
+- [Quick start](#quick-start)
+- [Writing slides](#writing-slides)
+- [Presenting](#presenting)
+- [Several presentations on one site](#several-presentations-on-one-site)
+- [Customizing](#customizing)
+- [Reference](#reference)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
 
-## Requirements
+## Quick start
 
-- Hugo 0.123.0 or later; the standard edition is enough, Extended is not required
-- Go and Git, to install the theme as a Hugo Module
+You need [Hugo](https://gohugo.io/installation/) 0.123 or later (the standard edition is enough), plus Go and Git for Hugo Modules.
 
-Check your installation:
+**1. Create a site and add the theme**
 
 ```bash
-hugo version
-go version
+hugo new site my-talks && cd my-talks
+hugo mod init github.com/me/my-talks
 ```
 
-## Using the theme
-
-Add the theme module to the site's `hugo.toml`:
+Replace the content of `hugo.toml` with:
 
 ```toml
+title = "My talks"
+languageCode = "en"
+
 [module]
   [[module.imports]]
     path = "github.com/npellegrin/hugo-powerslides"
-```
 
-Initialize the site's Hugo module if necessary:
+# Recommended: these settings cannot come from a theme, so they go in your site.
+[markup.goldmark.renderer]
+  unsafe = true              # allows HTML in slides
+[markup.highlight]
+  noClasses = false          # code colors follow the slide theme
+```
 
 ```bash
-hugo mod init example.com/my-slides
+hugo mod get github.com/npellegrin/hugo-powerslides@latest
 ```
 
-Download the theme:
+**2. Write a presentation** in `content/hello.md`:
 
-```bash
-hugo mod get github.com/npellegrin/hugo-powerslides
-hugo mod tidy
+```markdown
+---
+title: "Hello"
+description: "My first deck."
+---
+
+{{< slide layout="title" >}}
+
+# Hello
+
+## A first presentation
+
+---
+
+# Agenda
+
+- Why
+- How
+- What next
+
+{{< notes >}}
+Only visible in presenter mode.
+{{< /notes >}}
+
+---
+
+# Thank you!
 ```
 
-Run Hugo:
+**3. Run it**
 
 ```bash
 hugo server
 ```
 
-To pin a version, use a release tag: `hugo mod get github.com/npellegrin/hugo-powerslides@v0.1.0`.
+Open <http://localhost:1313/hello/>, press <kbd>→</kbd> to move forward and <kbd>P</kbd> to open the presenter window. The home page lists your presentations.
 
-Without Hugo Modules, clone the theme into `themes/hugo-powerslides` (for example as a Git submodule) and set `theme = "hugo-powerslides"` in `hugo.toml`.
-
-## Site structure
-
-- Each regular page is a slide deck: `content/talks/my-talk.md`.
-- The home page, sections, and taxonomy pages list their decks, with their title, `description`, date, and number of slides.
-- To make the home page (or a section) a deck itself, give its `_index.md` the front matter `layout: "slides"`.
+To publish, run `hugo` and upload the `public/` folder to any static host. The site also works in a subfolder, such as `https://example.com/talks/`.
 
 ## Writing slides
 
-Separate slides with `---`:
+### Slides
+
+Separate slides with `---` on its own line, **with a blank line before it**:
 
 ```markdown
----
-title: "My talk"
-description: "Shown in the list of decks."
----
+# First slide
 
-{{< slide id="intro" layout="title" transition="zoom" >}}
-
-# My talk
+Some text.
 
 ---
 
 # Second slide
 ```
 
-Leave a blank line before each `---`: right under a line of text, Markdown reads it as a heading underline and the two slides merge. Hugo prints a warning when this happens. `***` and `___` also separate slides; use `{{</* rule */>}}` for a visible line inside a slide.
+> Without the blank line, Markdown reads `---` as a heading underline and the two slides merge. Hugo prints a warning when this happens.
 
-Footnotes (`[^1]`) are shown at the bottom of the slide that cites them.
+To draw a visible line inside a slide, use `{{< rule >}}`.
 
-The optional `slide` shortcode at the top of a slide accepts:
+### Options for one slide
 
-| Option       | Description                                                                 |
-| ------------ | --------------------------------------------------------------------------- |
-| `id`         | Stable anchor for direct links (defaults to `slide-N`).                     |
-| `layout`     | `default`, `title`, `section`, `center`, `hero`, `image-left`, `image-right`. |
-| `image`      | Image used by `hero`, `image-left`, and `image-right`.                      |
-| `alt`        | Alternative text for `image`; leave empty for decorative images.            |
-| `transition` | See below. Defaults to the page, then site setting.                         |
-| `theme`      | Color theme for this slide only.                                            |
-| `class`      | Extra CSS classes (`no-footer` hides the footer).                           |
-| `background` | Background color (any CSS color); combine with `theme` for matching text.   |
-| `background-image` | Background image, tinted with the theme background.                  |
-| `background-dim` | Tint opacity over the background image, from 0 to 1 (default 0.75).     |
+Put a `slide` shortcode at the top of a slide to set its options:
 
-`section` slides are numbered automatically.
+```markdown
+{{< slide id="agenda" layout="center" transition="zoom" theme="light" >}}
 
-### Transitions
+# Agenda
+```
 
-- Subtle: `fade` (default), `slide`, `up`, `zoom`, `blur`, `none`
-- Classic: `push`, `flip`, `wipe`, `iris`
-- Kitsch: `spin`, `bounce`, `swing`, `tv`
+The `id` gives the slide a stable link (`/hello/#agenda`). All options are listed in the [reference](#slide-options).
 
-All transitions fall back to a short fade when the system requests reduced motion.
+### Speaker notes
+
+```markdown
+{{< notes >}}
+Remind the audience about the survey.
+{{< /notes >}}
+```
+
+Notes are hidden on the slide and shown in presenter mode.
+
+### Layouts
+
+A title slide:
+
+```markdown
+{{< slide layout="title" >}}
+
+# Hugo PowerSlides
+
+## Presentations in Markdown
+```
+
+A numbered part divider (numbers 01, 02… are added automatically):
+
+```markdown
+{{< slide layout="section" >}}
+
+# Getting started
+
+Everything you need for your first deck.
+```
+
+A big statement or quote:
+
+```markdown
+{{< slide layout="center" >}}
+
+> Simplicity is prerequisite for reliability.
+
+— Edsger W. Dijkstra
+```
+
+A full-screen image with a message:
+
+```markdown
+{{< slide layout="hero" image="/images/mountains.jpg" >}}
+
+# Ship it.
+```
+
+An image next to the text (`image-left` or `image-right`):
+
+```markdown
+{{< slide layout="image-left" image="/images/team.jpg" alt="The team at the offsite" >}}
+
+# Our team
+
+- 12 people
+- 4 countries
+```
+
+Give `alt` a description when the image carries meaning; leave it out when it is decorative.
+
+### Backgrounds
+
+```markdown
+{{< slide background-image="/images/city.jpg" >}}
+{{< slide background-image="/images/city.jpg" background-dim="0.5" >}}
+{{< slide background="#312e81" theme="synthwave" >}}
+```
+
+Background images are tinted with the theme's background color (75% by default) so that text stays readable. With a background color, pick a `theme` whose text matches it.
 
 ### Step-by-step reveals
 
-Wrap content in `fragments`: each list item, or each top-level block, appears on its own step.
+Each list item appears on the next key press:
 
 ```markdown
-{{</* fragments style="zoom" */>}}
+{{< fragments >}}
 - First point
 - Second point
-{{</* /fragments */>}}
+- Third point
+{{< /fragments >}}
 ```
 
-Styles: `up` (default), `fade`, `zoom`, `highlight`. Any element with the `fragment` class (and optionally `fragment--fade`, etc.) is also a step. Going back into a slide shows all of its steps.
+Styles: `up` (default), `fade`, `zoom`, and `highlight`, which colors each item in turn:
 
-The `anim-fade`, `anim-up`, `anim-zoom`, and `anim-slide` classes are different: they play automatically when the slide appears.
+```markdown
+{{< fragments style="highlight" >}}
+- Plan
+- Build
+- Ship
+{{< /fragments >}}
+```
 
-### Shortcodes
+Any HTML element with the `fragment` class is also a step: `<p class="fragment">Surprise!</p>`.
 
-- `columns` (`count` = 2, 3, or 4) containing `column` blocks
-- `figure` (`src`, `alt`, `caption`)
-- `callout` (`type` = `note`, `tip`, or `warning`; optional `title`)
-- `fragments` (`style`), see above
-- `rule`: a visible horizontal line
-- `video` (`src`, `poster`, `caption`, `title`, `autoplay`, `loop`, `controls`): autoplay videos start muted when their slide appears and pause when it is left
-- `embed` (`src`, `title`, `ratio` such as `4/3`, `sandbox`): sandboxed iframe, loaded only while its slide is current or next. Other sites keep their own origin (`allow-same-origin`, needed by most players and maps); pages from the same site do not, so they cannot lift the sandbox. Browsers may still warn about `allow-scripts` with `allow-same-origin`: for another site, this is safe. Remember to list the site in `csp.frameSrc`.
-- `notes` for speaker notes, shown in presenter mode (<kbd>P</kbd>)
+To animate items as soon as the slide appears, without waiting for a key press, use the `anim-fade`, `anim-up`, `anim-zoom`, or `anim-slide` classes:
 
-Markdown tables, code blocks, blockquotes, task lists, `<kbd>`, and `<mark>` are styled.
+```html
+<ul>
+  <li class="anim-up">Appears first</li>
+  <li class="anim-fade">Then this one</li>
+</ul>
+```
 
-### Code, math, and diagrams
+### Transitions
 
-- **Code** follows the slide theme when Hugo emits CSS classes (`noClasses = false`, see below). Use `hl_lines` to highlight lines: ```` ```js {hl_lines=[2]} ````. With Hugo's default inline colors, the chosen `markup.highlight.style` applies instead.
-- **Math**: write `\( … \)` inline and `$$ … $$` or `\[ … \]` for blocks. KaTeX loads only when a page contains these delimiters; force it with `math: true` or `math: false` in front matter. It needs the Goldmark passthrough extension (see below).
-- **Diagrams**: a ```` ```mermaid ```` code block becomes a Mermaid diagram in the slide's colors. Mermaid loads only on pages that contain one.
+```markdown
+{{< slide transition="flip" >}}
+```
 
-### Images and links
+| Style   | Transitions                                          |
+| ------- | ---------------------------------------------------- |
+| Subtle  | `fade` (default), `slide`, `up`, `zoom`, `blur`, `none` |
+| Classic | `push`, `flip`, `wipe`, `iris`                       |
+| Kitsch  | `spin`, `bounce`, `swing`, `tv`                      |
 
-Paths work the same whether the site is served from the domain root or a subfolder (for example `baseURL = "https://example.com/talks/"`):
+Set a default for a presentation with `transition: zoom` in its front matter, or for the whole site in `hugo.toml`. When the system asks for reduced motion, every transition becomes a short fade.
 
-- `/images/photo.jpg` points to the site's `static/images/photo.jpg`, with the base path added;
-- `photo.jpg` uses the file next to the Markdown file (page bundle) when there is one;
-- full URLs and `#anchors` are left unchanged.
+### Columns
 
-This applies to Markdown images and links, and to every theme option or shortcode that takes a path (`image`, `background-image`, `figure`, `video`, footer `logo`, `customCSS`).
+```markdown
+{{< columns count="2" >}}
+{{< column >}}
+### Before
 
-### Footer
+Manual slides.
+{{< /column >}}
+{{< column >}}
+### After
 
-A footer with the slide number is shown on every slide except `title` and `hero` layouts. Add a text and a logo in the configuration below; set `number = false` to remove the number. Hide it on one slide with `class="no-footer"`.
+Markdown slides.
+{{< /column >}}
+{{< /columns >}}
+```
 
-## Presenting
+`count` can be 2, 3, or 4. Columns stack on phones.
 
-| Keys                                          | Action                         |
-| --------------------------------------------- | ------------------------------ |
-| <kbd>→</kbd> <kbd>↓</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd> | Next step or slide |
-| <kbd>←</kbd> <kbd>↑</kbd> <kbd>Page Up</kbd>  | Previous step or slide         |
-| <kbd>Home</kbd> <kbd>End</kbd>                | First or last slide            |
-| Slide number, then <kbd>Enter</kbd>           | Go to that slide               |
-| <kbd>O</kbd> or <kbd>Esc</kbd>                | Overview (arrows, <kbd>Enter</kbd>, or click to pick a slide) |
-| <kbd>F</kbd>                                  | Toggle fullscreen              |
-| <kbd>P</kbd>                                  | Open the presenter window      |
+### Figures and callouts
 
-On touch screens, swipe left or right. Page Up and Page Down make most presentation clickers work out of the box.
+```markdown
+{{< figure src="/images/architecture.svg" alt="Browser, CDN, and API servers" caption="Our architecture" >}}
 
-Slides are drawn on a fixed canvas (1920×1080 by default) scaled to fit the window, so they look the same on a laptop and a projector. On portrait phones, the canvas becomes fluid with a smaller font.
+{{< callout type="tip" title="Pro tip" >}}
+Press **O** to see every slide at once.
+{{< /callout >}}
+```
 
-The presenter window stays in sync with the audience window. It shows the current slide with upcoming steps faded, the next slide, the speaker notes, an elapsed-time timer (pause and reset), and the clock.
+Callout types: `note`, `tip`, `warning`. Each has its own icon, so they remain distinguishable without color.
 
-### Export to PDF
+### Tables, quotes, and more
 
-Print the page from the browser and choose **Save as PDF**. Each slide becomes one page at the canvas size, with every step visible and controls hidden. Enable background graphics if the print dialog asks. Chromium-based browsers honor the page size best.
+Standard Markdown works and is styled for projection: tables (with column alignment), blockquotes, task lists, `<kbd>` keys, `<mark>` highlights, and footnotes, which appear at the bottom of the slide that cites them.
 
-## Configuration
+```markdown
+| Plan  | Price |
+| :---- | ----: |
+| Free  |    0€ |
+| Pro   |   10€ |
 
-Hugo does not merge `markup` settings from themes, so set them in the site's `hugo.toml`:
+Press <kbd>Ctrl</kbd> <kbd>S</kbd> to <mark>save</mark>.[^1]
+
+[^1]: Or use the menu.
+```
+
+### Code
+
+````markdown
+```js {hl_lines=[2]}
+function next() {
+  render(index + 1);
+}
+```
+````
+
+`hl_lines` highlights lines. Code colors follow the slide theme when `noClasses = false` is set (see [Quick start](#quick-start)); otherwise Hugo's `markup.highlight.style` applies.
+
+### Math
+
+```markdown
+Euler's identity: \(e^{i\pi} + 1 = 0\)
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$
+```
+
+Add this to `hugo.toml`, so that Markdown leaves the formulas untouched:
 
 ```toml
-# Allows inline HTML in slides, such as <li class="anim-up">.
-[markup.goldmark.renderer]
-  unsafe = true
-
-# Emits CSS classes so code colors follow the theme.
-[markup.highlight]
-  noClasses = false
-
-# Required for math: leaves LaTeX untouched for KaTeX.
 [markup.goldmark.extensions.passthrough]
   enable = true
   [markup.goldmark.extensions.passthrough.delimiters]
     block = [['\[', '\]'], ['$$', '$$']]
     inline = [['\(', '\)']]
-
-[params.powerslides]
-  theme = "dark"         # dark, light, solarized, synthwave, terminal
-  transition = "fade"
-  progress = true        # progress bar at the top
-  width = 1920           # canvas size in pixels; use 1600 × 1200 for 4:3
-  height = 1080
-  customCSS = ["css/custom.css"]
-  favicon = "/favicon.svg"  # browser tab icon (SVG, PNG, or ICO); defaults to the theme's icon
-
-  [params.powerslides.colors]
-    primary = "#34d399"
-    on-primary = "#022c22"
-
-  [params.powerslides.footer]
-    text = "Jane Doe · Conference 2026"   # Markdown allowed
-    logo = "/images/logo.svg"
-    logoAlt = ""                           # empty when the logo is decorative
-    number = true
 ```
 
-`theme`, `transition`, `colors`, and `favicon` can also be set in a page's front matter.
+KaTeX loads only on pages that contain math. Force it on or off with `math: true` or `math: false` in front matter.
 
-Color tokens: `background`, `surface`, `border`, `text`, `muted`, `primary`, `on-primary`, `accent`, `warning`, `code-background`, `code-text`. Each maps to a `--color-*` CSS property. Keep text at a contrast ratio of at least 4.5:1 against `background` and `surface`.
+### Diagrams
 
-To create a new theme, define the tokens under a `[data-theme="name"]` selector in a custom stylesheet and set `theme = "name"`. Fonts use `--font-body`, `--font-heading`, and `--font-mono`.
+````markdown
+```mermaid
+flowchart LR
+  Write --> Build --> Present
+```
+````
 
-## Customizing the styles and scripts
+Diagrams use the colors of their slide. Mermaid loads only on pages that contain one.
 
-The theme's CSS and JavaScript live in `assets/slides/` as small files, one per concern. Hugo joins them at build time into one stylesheet and one script, minified in production (`hugo`) and readable during development (`hugo server`). File names include a content hash for caching, and each file is loaded with its own integrity hash.
+### Videos and embedded pages
 
-- To add styles, use `customCSS` (see Configuration).
-- To replace one part, copy its file to the same path in your site, for example `assets/slides/css/themes.css`: Hugo uses the site's copy instead of the theme's.
+```markdown
+{{< video src="/videos/demo.mp4" poster="/videos/demo.jpg" autoplay="true" loop="true" >}}
 
-## External libraries
+{{< embed src="https://www.youtube-nocookie.com/embed/VIDEO_ID" title="Product demo" >}}
+```
 
-The theme itself has no dependency. KaTeX and Mermaid are loaded only on pages that use them, from pinned versions, with [Subresource Integrity](https://developer.mozilla.org/docs/Web/Security/Subresource_Integrity): the browser refuses any file whose hash differs.
+- Autoplay videos start muted when their slide appears and pause when you leave it.
+- Embedded pages load only when their slide is current or next. Allow their site in the [security settings](#security): `frameSrc = ["https://www.youtube-nocookie.com"]`.
 
-| Library | Version | Files                                                        |
-| ------- | ------- | ------------------------------------------------------------ |
-| KaTeX   | 0.18.7  | `katex.min.css`, `katex.min.js`, `contrib/auto-render.min.js` |
-| Mermaid | 11.17.2 | `mermaid.min.js` (single-file build, so the hash covers all the code) |
+### Images and links
 
-The files are served by jsDelivr from the npm packages. Before pinning, each file was checked to be byte-identical to the npm tarball, and each tarball against the registry's integrity hash. Mermaid is published with an npm provenance attestation from its GitHub repository. Neither version had a known security advisory. Mermaid runs with `securityLevel: "strict"`, and KaTeX with its default `trust: false`.
+- `/images/photo.jpg` is the file `static/images/photo.jpg` of your site.
+- `photo.jpg` is a file next to your Markdown file (with `content/hello/index.md` and `content/hello/photo.jpg`).
+- Full URLs are used as they are.
 
-To present offline or avoid the CDN, copy the same files and point to them. The hashes still apply, so only these exact versions will load:
+Paths keep working when the site is published in a subfolder.
+
+## Presenting
+
+| Keys                                            | Action                                   |
+| ----------------------------------------------- | ---------------------------------------- |
+| <kbd>→</kbd> <kbd>↓</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd> | Next step or slide       |
+| <kbd>←</kbd> <kbd>↑</kbd> <kbd>Page Up</kbd>    | Previous step or slide                   |
+| <kbd>Home</kbd> <kbd>End</kbd>                  | First or last slide                      |
+| <kbd>1</kbd> <kbd>2</kbd> <kbd>Enter</kbd>      | Go to slide 12                           |
+| <kbd>O</kbd> or <kbd>Esc</kbd>                  | Overview of all slides                   |
+| <kbd>F</kbd>                                    | Fullscreen                               |
+| <kbd>P</kbd>                                    | Presenter window                         |
+
+- **Clickers** work out of the box: most send Page Up and Page Down.
+- **Touch screens**: swipe left or right.
+- **Same look everywhere**: slides are drawn at 1920×1080 and scaled to the screen, so what you see on your laptop is what the projector shows.
+
+### Presenter mode
+
+Press <kbd>P</kbd> to open a second window, and put it on your own screen while the first one goes to the projector. It shows:
+
+- the current slide, with the steps still to come faded;
+- the next slide;
+- your notes;
+- the elapsed time (with pause and reset) and the clock.
+
+Both windows stay in sync, whichever one you use to navigate.
+
+### PDF export
+
+Open the presentation, print it (<kbd>Ctrl</kbd> <kbd>P</kbd> or <kbd>⌘</kbd> <kbd>P</kbd>), and choose **Save as PDF**. You get one page per slide, with every step visible. Enable **Background graphics** if the dialog offers it. Chrome and Edge give the best result.
+
+## Several presentations on one site
+
+```text
+content/
+├── _index.md              → home page: lists everything below
+├── intro-to-hugo.md       → a presentation
+└── conferences/
+    ├── _index.md          → lists the presentations of this section
+    ├── devfest-2026.md
+    └── meetup/
+        ├── index.md       → a presentation with its own images
+        └── diagram.png
+```
+
+List pages show each presentation's `title`, `description`, `date`, and number of slides:
+
+```markdown
+---
+title: "DevFest 2026"
+description: "How we moved our docs to Hugo."
+date: 2026-11-20
+---
+```
+
+To make the home page itself a presentation instead of a list, add `layout: "slides"` to `content/_index.md`.
+
+## Customizing
+
+### Color themes
+
+Five themes are included: `dark` (default), `light`, `solarized`, `synthwave`, and `terminal`.
+
+```toml
+# hugo.toml: the whole site
+[params.powerslides]
+  theme = "light"
+```
+
+```markdown
+---
+title: "My talk"
+theme: solarized        # one presentation
+---
+
+{{< slide theme="terminal" >}}   <!-- one slide -->
+```
+
+### Your own colors
+
+Change any color of the current theme:
+
+```toml
+[params.powerslides.colors]
+  primary = "#34d399"
+  on-primary = "#022c22"
+  background = "#0f172a"
+```
+
+Available colors: `background`, `surface`, `border`, `text`, `muted`, `primary`, `on-primary`, `accent`, `warning`, `code-background`, `code-text`. Keep text readable: aim for a contrast ratio of at least 4.5:1 against `background` and `surface`.
+
+### Your own theme or fonts
+
+Create `static/css/custom.css`:
+
+```css
+[data-theme="ocean"] {
+  --color-background: #0b1d2a;
+  --color-surface: #12303f;
+  --color-border: #1f4b5f;
+  --color-text: #e6f4f1;
+  --color-muted: #9cc3c9;
+  --color-primary: #5eead4;
+  --color-on-primary: #0b1d2a;
+  --color-accent: #fbbf24;
+}
+
+:root {
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Poppins", var(--font-body);
+}
+```
 
 ```toml
 [params.powerslides]
-  katexURL = "/vendor/katex"                  # folder containing katex.min.css, katex.min.js, contrib/
-  mermaidURL = "/vendor/mermaid.min.js"
+  theme = "ocean"
+  customCSS = ["/css/custom.css"]
 ```
 
-Updating a version means updating its hashes in `layouts/_default/slides.html`.
+To change a part of the theme's own styles, copy its file into your site at the same path, for example `assets/slides/css/layouts.css`. Hugo then uses your copy.
 
-## Content-Security-Policy
+### Footer
 
-Slide pages carry a Content-Security-Policy that lets the browser run only the theme's scripts and the pinned KaTeX and Mermaid files, on the pages that use them. It forbids `eval`, plugins, forms, and frames. Images, media, and connections are limited to the site itself (plus `data:` images).
+```toml
+[params.powerslides.footer]
+  text = "Jane Doe · DevFest 2026"
+  logo = "/images/logo.svg"
+```
 
-Allow what your slides need:
+The slide number is shown by default (`number = false` removes it). The footer is hidden on `title` and `hero` slides, and on any slide with `class="no-footer"`. A presentation can set its own `footer` in front matter.
+
+### Slide size
+
+```toml
+[params.powerslides]
+  width = 1600    # 4:3
+  height = 1200
+```
+
+## Reference
+
+### Slide options
+
+| Option             | Example                         | Effect                                               |
+| ------------------ | ------------------------------- | ---------------------------------------------------- |
+| `id`               | `id="agenda"`                   | Link to the slide: `/talk/#agenda`                   |
+| `layout`           | `layout="section"`              | `default`, `title`, `section`, `center`, `hero`, `image-left`, `image-right` |
+| `image`            | `image="/images/team.jpg"`      | Image for `hero`, `image-left`, `image-right`        |
+| `alt`              | `alt="The team"`                | Description of `image`                               |
+| `transition`       | `transition="push"`             | See [Transitions](#transitions)                      |
+| `theme`            | `theme="light"`                 | Color theme for this slide                           |
+| `background`       | `background="#312e81"`          | Background color                                     |
+| `background-image` | `background-image="/img/a.jpg"` | Background image                                     |
+| `background-dim`   | `background-dim="0.5"`          | Tint over the background image, from 0 to 1          |
+| `class`            | `class="no-footer"`             | Extra CSS classes                                    |
+
+### Shortcodes
+
+| Shortcode   | Example                                                        |
+| ----------- | -------------------------------------------------------------- |
+| `slide`     | `{{< slide layout="title" >}}`                                 |
+| `notes`     | `{{< notes >}}…{{< /notes >}}`                                 |
+| `fragments` | `{{< fragments style="zoom" >}}…{{< /fragments >}}`            |
+| `columns`   | `{{< columns count="3" >}}{{< column >}}…{{< /column >}}…{{< /columns >}}` |
+| `figure`    | `{{< figure src="/a.png" alt="…" caption="…" >}}`              |
+| `callout`   | `{{< callout type="warning" title="Careful" >}}…{{< /callout >}}` |
+| `rule`      | `{{< rule >}}`                                                 |
+| `video`     | `{{< video src="/a.mp4" poster="/a.jpg" autoplay="true" loop="true" controls="false" caption="…" >}}` |
+| `embed`     | `{{< embed src="https://…" title="…" ratio="4/3" >}}`          |
+
+### Front matter
+
+```yaml
+---
+title: "My talk"
+description: "Shown in lists and search results."
+date: 2026-11-20
+theme: light                 # color theme
+transition: zoom             # default transition
+math: true                   # force KaTeX on or off
+favicon: "icon.svg"          # browser tab icon
+colors:
+  primary: "#34d399"
+footer:
+  text: "DevFest 2026"
+layout: "slides"             # only for _index.md files
+---
+```
+
+### Site settings
+
+```toml
+[params.powerslides]
+  theme = "dark"                    # default color theme
+  transition = "fade"               # default transition
+  progress = true                   # progress bar at the top
+  width = 1920                      # slide size in pixels
+  height = 1080
+  favicon = "/favicon.svg"          # browser tab icon (default: the theme's)
+  customCSS = ["/css/custom.css"]   # extra stylesheets
+
+  [params.powerslides.colors]       # see "Your own colors"
+  [params.powerslides.footer]       # text, logo, logoAlt, number
+  [params.powerslides.csp]          # see "Security"
+```
+
+## Security
+
+Presentations are protected by a Content-Security-Policy: the browser only runs the theme's own code, plus KaTeX and Mermaid on pages that use them, from exact versions whose integrity is checked.
+
+If something from another site does not show up, allow its origin:
 
 ```toml
 [params.powerslides.csp]
-  enable = true                                   # set to false to remove the policy
-  frameSrc = ["https://www.youtube-nocookie.com"] # required for the embed shortcode
-  imgSrc = ["https://images.example.com"]
-  mediaSrc = []
+  frameSrc = ["https://www.youtube-nocookie.com"]   # embedded pages
+  imgSrc = ["https://images.example.com"]           # images
+  mediaSrc = []                                     # videos and audio
   connectSrc = []
   scriptSrc = []
   styleSrc = []
   fontSrc = []
+  # enable = false                                  # removes the policy
 ```
 
-Styles allow `'unsafe-inline'` because the theme, KaTeX, and Mermaid set inline styles. A `<meta>` policy cannot set `frame-ancestors`; to prevent other sites from framing the slides, send that directive (or `X-Frame-Options`) as an HTTP header from the web server.
+To present **without internet access**, copy the KaTeX and Mermaid files into your site and point to them. Only the exact expected versions will load:
 
-## Development
-
-The theme needs no build tool: Hugo bundles the CSS and JavaScript. Node.js 20 or later is only needed to run the unit tests:
-
-```bash
-npm test
+```toml
+[params.powerslides]
+  katexURL = "/vendor/katex"               # contains katex.min.css, katex.min.js, contrib/auto-render.min.js
+  mermaidURL = "/vendor/mermaid.min.js"
 ```
 
-Continuous integration runs the tests and builds the [demo](https://github.com/npellegrin/hugo-powerslides-demo) with the minimum supported Hugo version and the latest release, failing on any warning. It checks out both repositories side by side, as the demo's `go.mod` expects.
+| Library | Version | Files                                                          |
+| ------- | ------- | -------------------------------------------------------------- |
+| KaTeX   | 0.18.7  | `dist/katex.min.css`, `dist/katex.min.js`, `dist/contrib/auto-render.min.js`, `dist/fonts/` |
+| Mermaid | 11.17.2 | `dist/mermaid.min.js`                                          |
 
-To release a version:
+Both are available from npm or jsDelivr. The theme's pages can also be protected from being framed by other sites: send a `frame-ancestors 'self'` Content-Security-Policy header from your web server (a `<meta>` tag cannot do it).
 
-1. Move the changes under `Unreleased` in `CHANGELOG.md` to the new version.
-2. Tag the commit: `git tag v0.1.0 && git push origin v0.1.0`.
+## Troubleshooting
 
-The [Hugo themes gallery](https://github.com/gohugoio/hugoThemesSiteBuilder) also needs two screenshots in `images/`: `screenshot.png` (1500×1000) and `tn.png` (900×600).
+| Problem                                          | Solution                                                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------------ |
+| Two slides are merged into one                   | Add a blank line before `---`.                                           |
+| HTML in a slide is replaced by `<!-- raw HTML omitted -->` | Set `unsafe = true` under `[markup.goldmark.renderer]`.        |
+| Code colors do not match the theme               | Set `noClasses = false` under `[markup.highlight]`.                      |
+| Formulas show as raw text                        | Enable the passthrough extension (see [Math](#math)).                    |
+| An embedded page stays blank                     | Add its site to `frameSrc` (see [Security](#security)).                  |
+| An image is missing once published               | Start its path with `/` for files in `static/`, or put it next to the Markdown file. |
+| The browser console reports a blocked inline script from "sandbox eval code" | A browser extension is being blocked; the presentation is not affected. |
