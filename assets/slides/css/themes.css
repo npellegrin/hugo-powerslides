@@ -1,5 +1,10 @@
 /* Color themes. Select one with the theme param; override any token with the colors param (see README). */
 
+/* Slide fill (color or gradient). Reset on every themed element so a per-slide theme never inherits the page theme's gradient. */
+[data-theme] {
+  --theme-background: var(--color-background);
+}
+
 :root,
 [data-theme="dark"] {
   --color-background: #111827;
@@ -120,4 +125,110 @@
   --code-inserted: #4ade80;
   --heading-glow: 0 0 0.3em rgb(74 222 128 / 50%);
   --font-body: var(--font-mono);
+}
+
+[data-theme="halloween"] {
+  --color-background: #0f0a08;
+  --color-surface: #241610;
+  --color-border: #7a4a22;
+  --color-text: #ff9431;
+  --color-muted: #c4875a;
+  --color-primary: #ffe8c2;
+  --color-on-primary: #0f0a08;
+  --color-accent: #9be36b;
+  --color-warning: #e85d5d;
+  --color-code-background: #0a0705;
+  --color-code-text: #d6ccc2;
+  --code-keyword: #ff9431;
+  --code-string: #9be36b;
+  --code-comment: #a8957f;
+  --code-function: #ffe8c2;
+  --code-number: #ff8a8a;
+  --code-type: #ffb070;
+  --code-tag: #ff9431;
+  --code-deleted: #ff8a8a;
+  --code-inserted: #9be36b;
+  --heading-glow: 0 0 0.12em #ff7518, 0 0 0.6em rgb(255 117 24 / 55%);
+}
+
+[data-theme="unicorn"] {
+  --color-background: #fff0fa;
+  --color-surface: #fff0fa;
+  --color-border: #e0359f;
+  --color-text: #3d0b4a;
+  --color-muted: #6e2a73;
+  --color-primary: #9a0062;
+  --color-on-primary: #ffffff;
+  --color-accent: #3f2bd1;
+  --color-warning: #7a3700;
+  --color-code-background: #2d0f42;
+  --color-code-text: #fdf0ff;
+  --code-keyword: #ff7ad9;
+  --code-string: #ffe066;
+  --code-comment: #c3a6dc;
+  --code-function: #7ee8fa;
+  --code-number: #ffb38a;
+  --code-type: #c9b8ff;
+  --code-tag: #7ee8fa;
+  --code-deleted: #ff9aa8;
+  --code-inserted: #9ef0b0;
+  /* Sticker look: a white outline, then a hot pink drop shadow offset clear of the letters. */
+  --heading-glow:
+    0.03em 0 0 #ffffff, -0.03em 0 0 #ffffff, 0 0.03em 0 #ffffff, 0 -0.03em 0 #ffffff,
+    0.08em 0.08em 0 #ff4fb8;
+  --font-heading: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", system-ui, sans-serif;
+  /* Pearly pink-lavender-blue sheen; the darkest stop keeps every text color above 4.5:1. */
+  --theme-background:
+    radial-gradient(circle at 15% 10%, rgb(255 255 255 / 60%), transparent 45%),
+    linear-gradient(135deg, #ffb8e1, #e3c4ff 50%, #b8e6ff);
+}
+
+/* Gold, white, and ice blue on deep red: no meaning rests on red against green, the pair most color-blind viewers confuse. */
+[data-theme="christmas"] {
+  --color-background: #4a0d16;
+  --color-surface: #63131f;
+  --color-border: #8f2a38;
+  --color-text: #fff8ee;
+  --color-muted: #f0c9c4;
+  --color-primary: #ffd166;
+  --color-on-primary: #4a0d16;
+  --color-accent: #9fd8ff;
+  --color-warning: #ffffff;
+  --color-code-background: #2a070d;
+  --color-code-text: #f6ece6;
+  --code-keyword: #ffd166;
+  --code-string: #b9f0c4;
+  --code-comment: #c9a3a3;
+  --code-function: #9fd8ff;
+  --code-number: #ffbf80;
+  --code-type: #ffe6a8;
+  --code-tag: #9fd8ff;
+  --code-deleted: #ff9e9e;
+  --code-inserted: #b9f0c4;
+  --heading-glow: 0 0 0.4em rgb(255 209 102 / 40%);
+}
+
+/* Gold, ice blue, and a light holly red on fir green: no meaning rests on red against green. */
+[data-theme="evergreen"] {
+  --color-background: #0f2a1d;
+  --color-surface: #173a29;
+  --color-border: #2f5e45;
+  --color-text: #fdf8ef;
+  --color-muted: #c3d6c8;
+  --color-primary: #ffd166;
+  --color-on-primary: #0f2a1d;
+  --color-accent: #9fd8ff;
+  --color-warning: #ff9e9e;
+  --color-code-background: #0a1f15;
+  --color-code-text: #f1efe6;
+  --code-keyword: #ff9e9e;
+  --code-string: #ffd166;
+  --code-comment: #9fb8a8;
+  --code-function: #9fd8ff;
+  --code-number: #ffbf80;
+  --code-type: #ffe6a8;
+  --code-tag: #9fd8ff;
+  --code-deleted: #ff9e9e;
+  --code-inserted: #b9f0c4;
+  --heading-glow: 0 0 0.4em rgb(255 209 102 / 35%);
 }

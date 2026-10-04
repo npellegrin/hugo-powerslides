@@ -409,7 +409,7 @@ To make the home page itself a presentation instead of a list, add `layout: "sli
 
 ### Color themes
 
-Five themes are included: `dark` (default), `light`, `solarized`, `synthwave`, and `terminal`.
+Nine themes are included: `dark` (default), `light`, `solarized`, `synthwave`, `terminal`, `halloween`, `unicorn`, `christmas`, and `evergreen`.
 
 ```toml
 # hugo.toml: the whole site

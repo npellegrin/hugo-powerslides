@@ -155,7 +155,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--slide-background, var(--color-background));
+  background: var(--slide-background, var(--theme-background));
   opacity: var(--background-dim, 0.75);
 }
 

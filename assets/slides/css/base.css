@@ -42,7 +42,7 @@ body {
   display: grid;
   place-items: center;
   padding: var(--slide-padding);
-  background: var(--slide-background, var(--color-background));
+  background: var(--slide-background, var(--theme-background));
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--font-size-base);

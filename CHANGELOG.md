@@ -25,7 +25,7 @@ First public release.
 
 ### Themes and sites
 
-- Five color themes (`dark`, `light`, `solarized`, `synthwave`, `terminal`), per page or per slide, with overridable color tokens.
+- Nine color themes (`dark`, `light`, `solarized`, `synthwave`, `terminal`, `halloween`, `unicorn`, `christmas`, `evergreen`), per page or per slide, with overridable color tokens.
 - List pages for home, sections, and taxonomies; regular pages are slide decks without extra front matter.
 - Works when the site is deployed under a subfolder.
 
